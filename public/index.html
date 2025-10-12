@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <!-- Favicon -->
+     <link rel="icon" type="image/png" href="./assets/favicon/favicon.png">
+    <!-- Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@100..900&display=swap" rel="stylesheet">
+    <!-- CSS -->
+     <!-- <link rel="stylesheet" href="./main.css"> -->
+    <title>Модель Солнечной системы</title>
+</head>
+<body>
+    <main id="side-panel" class="side-panel">
+        <div class="side-panel__top-line-сontainer container">
+            <ul class="side-panel__top-lines">
+                <li class="side-panel__top-lines-row">
+                    <h1 id="side-panel__object-name" class="side-panel__object-name">Объект</h1>
+                    <button id="side-panel__collapse-button" class="side-panel__panel-collapse-button icon-button-desktop"><img class="collapse-panel-icon" src="./assets/icons/arrows_icon.svg" alt="collapse"></button>
+                </li>
+                <li>
+                    <h3 id="side-panel__object-type" class="side-panel__object-type">Тип объекта</h3>
+                </li>
+            </ul>
+        </div>
+        <div class="side-panel__chapters-group-list">
+            <div id="side-panel__object-description" class="side-panel__object-description chapter">
+                <div id="side-panel__object-description__expand-button" class="side-panel__chapter-header-line">
+                    <h2 class="side-panel__chapter-header">Описание</h2>
+                    <img id="folded-description-chapter-plus-sign" class="folded-chapter-plus-sign hidden" src="./assets/icons/plus_sign.svg" alt="expand">
+                </div>
+                <p id="side-panel__object-description-paragraph" class="side-panel__object-description-paragraph">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Perferendis quia enim nam pariatur quidem. Repudiandae libero optio dolor aliquid modi? Maxime quibusdam in expedita, esse porro accusamus. Accusantium, minima maxime?
+                Expedita veniam dolor ipsa debitis sunt sapiente vel hic qui similique eveniet? Alias rerum quaerat exercitationem nostrum saepe dignissimos beatae dolorem dicta labore illo, soluta modi architecto ex aut hic!</p>
+                <button id="side-panel__object-description__collapse-button" class="side-panel__chapter-collapse-button">Скрыть</button>
+            </div>
+            <!-- Folded-chapter should be a toggled class  -->
+            <div id="side-panel__object-features" class="side-panel__object-features chapter">
+                <div id="side-panel__object-features__expand-button" class="side-panel__chapter-header-line">
+                    <h2 class="side-panel__chapter-header">Характеристики</h2>
+                    <img id="folded-features-chapter-plus-sign" class="folded-chapter-plus-sign hidden" src="./assets/icons/plus_sign.svg" alt="expand">
+                </div>
+                <ul id="side-panel__object-features-groups-list" class="side-panel__object-features-groups-list">
+                    <ul id="side-panel__celestial-body-features-list" class="side-panel__object-features-group">
+                        <h4 class="side-panel__object-features-group-header">Группа 1</h4>
+
+                        <li class="side-panel__object-feature">
+                            <span class="side-panel__object-feature-name">Feature 1:</span>
+                            <span class="side-panel__object-feature-value">Value 1</span>
+                        </li>
+                        <li class="side-panel__object-feature">
+                            <span class="side-panel__object-feature-name">Масса:</span>
+                            <span class="side-panel__object-feature-value">100 кг</span>
+                        </li>
+                    </ul>
+                    <ul id="side-panel__orbit-features-list" class="side-panel__object-features-group">
+                        <h4 class="side-panel__object-features-group-header">Группа 2</h4>
+
+                        <li class="side-panel__object-feature">
+                            <span class="side-panel__object-feature-name">Feature 1:</span>
+                            <span class="side-panel__object-feature-value">Value 1</span>
+                        </li>
+                        <li class="side-panel__object-feature">
+                            <span class="side-panel__object-feature-name">Feature 2:</span>
+                            <span class="side-panel__object-feature-value">Value 2</span>
+                        </li>
+                    </ul>
+                </ul>
+                <button id="side-panel__object-features__collapse-button" class="side-panel__chapter-collapse-button">Скрыть</button>
+            </div>
+        </div>
+    </main>
+    <div id="side-panel__expand-button" class="expand-side-panel-button icon-button-desktop hidden"><img src="./assets/icons/arrows_icon.svg" alt="expand" class="expand-side-panel-icon"></div>
+    <div class="top-right-menu">
+        <img id="objects-list-panel__expand-button" class="top-right-menu__burger-menu icon-button-desktop" src="./assets/icons/burger-menu.svg" alt="objects list">
+    </div>
+    <div id="objects-list-panel" class="objects-list-panel hidden">
+        <span id="objects-list-panel__collapse-button" class="objects-list-panel__close-icon-container icon-button-desktop hidden"><img src="./assets/icons/close_icon.svg" alt="close window"></span>
+        <div class="objects-list-panel__container">
+            <ul id="objects-list-panel__objects-list" class="objects-list-panel__objects-list">
+                <li id="0" class="objects-list-panel__object">
+                    <p class="objects-list-panel__object-name">Солнце</p>
+                </li>
+                <li id="1" class="objects-list-panel__object">
+                    <p class="objects-list-panel__object-name">Меркурий</p>
+                </li>
+                <li id="2" class="objects-list-panel__object">
+                    <p class="objects-list-panel__object-name">Венера</p>
+                </li>
+                <figure class="objects-list-panel__object--expandable">
+                    <span id="3" class="objects-list-panel__expandable-group-header">
+                        <figcaption  class="objects-list-panel__object-name">Земля</figcaption>
+                        <svg class="objects-list-panel__expand-list-icon" width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14.6667 22.6666L8 16L14.6667 9.33331M24 22.6666L17.3333 16L24 9.33331" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <ul class="objects-list-panel__object-satellites-list">
+                        <li id="31" class="objects-list-panel__object-satellite">Луна</li>
+                    </ul>
+                </figure>
+                <figure class="objects-list-panel__object--expandable">
+                    <span id="4" class="objects-list-panel__expandable-group-header">
+                        <figcaption  class="objects-list-panel__object-name">Марс</figcaption>
+                        <svg class="objects-list-panel__expand-list-icon" width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14.6667 22.6666L8 16L14.6667 9.33331M24 22.6666L17.3333 16L24 9.33331" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <ul class="objects-list-panel__object-satellites-list">
+                        <li id="41" class="objects-list-panel__object-satellite">Фобос</li>
+                        <li id="42" class="objects-list-panel__object-satellite">Деймос</li>
+                    </ul>
+                </figure>
+                <figure class="objects-list-panel__object--expandable">
+                    <span id="5" class="objects-list-panel__expandable-group-header">
+                        <figcaption  class="objects-list-panel__object-name">Юпитер</figcaption>
+                        <svg class="objects-list-panel__expand-list-icon" width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14.6667 22.6666L8 16L14.6667 9.33331M24 22.6666L17.3333 16L24 9.33331" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <ul class="objects-list-panel__object-satellites-list">
+                        <li id="51" class="objects-list-panel__object-satellite">Ио</li>
+                        <li id="52"  class="objects-list-panel__object-satellite">Европа</li>
+                        <li id="53"  class="objects-list-panel__object-satellite">Ганимед</li>
+                        <li id="54"  class="objects-list-panel__object-satellite">Каллисто</li>
+                    </ul>
+                </figure>
+                <figure class="objects-list-panel__object--expandable">
+                    <span id="6" class="objects-list-panel__expandable-group-header">
+                        <figcaption  class="objects-list-panel__object-name">Сатурн</figcaption>
+                        <svg class="objects-list-panel__expand-list-icon" width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14.6667 22.6666L8 16L14.6667 9.33331M24 22.6666L17.3333 16L24 9.33331" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <ul class="objects-list-panel__object-satellites-list">
+                        <li id="61" class="objects-list-panel__object-satellite">Мимас</li>
+                        <li id="62" class="objects-list-panel__object-satellite">Энцелад</li>
+                        <li id="63" class="objects-list-panel__object-satellite">Тефия</li>
+                        <li id="64" class="objects-list-panel__object-satellite">Диона</li>
+                        <li id="65" class="objects-list-panel__object-satellite">Рея</li>
+                        <li id="66" class="objects-list-panel__object-satellite">Титан</li>
+                        <li id="67" class="objects-list-panel__object-satellite">Япет</li>
+                    </ul>
+                </figure>
+                <figure class="objects-list-panel__object--expandable">
+                    <span id="7" class="objects-list-panel__expandable-group-header">
+                        <figcaption  class="objects-list-panel__object-name">Уран</figcaption>
+                        <svg class="objects-list-panel__expand-list-icon" width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14.6667 22.6666L8 16L14.6667 9.33331M24 22.6666L17.3333 16L24 9.33331" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <ul class="objects-list-panel__object-satellites-list">
+                        <li id="71" class="objects-list-panel__object-satellite">Миранда</li>
+                        <li id="72" class="objects-list-panel__object-satellite">Ариэль</li>
+                        <li id="73" class="objects-list-panel__object-satellite">Умбриэль</li>
+                        <li id="74" class="objects-list-panel__object-satellite">Титания</li>
+                        <li id="75" class="objects-list-panel__object-satellite">Оберон</li>
+                    </ul>
+                </figure>
+                <figure class="objects-list-panel__object--expandable">
+                    <span id="8" class="objects-list-panel__expandable-group-header">
+                        <figcaption  class="objects-list-panel__object-name">Нептун</figcaption>
+                        <svg class="objects-list-panel__expand-list-icon" width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14.6667 22.6666L8 16L14.6667 9.33331M24 22.6666L17.3333 16L24 9.33331" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <ul class="objects-list-panel__object-satellites-list">
+                        <li id="81" class="objects-list-panel__object-satellite">Тритон</li>
+                    </ul>
+                </figure>
+            </ul>
+        </div>
+    </div>
+    <canvas class="three-js"></canvas>
+</body>
+</html>

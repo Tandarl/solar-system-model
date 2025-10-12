@@ -1,0 +1,92 @@
+.objects-list-panel {
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    width: 100vw;
+    height: 100vh;
+    background-color: $objects-list-panel-bg;
+    z-index: 110;
+
+    font-family: "Exo 2", sans-serif;
+}
+
+.objects-list-panel__container {
+    width: 50vw;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.objects-list-panel__objects-list {
+    > li, figure:not(:first-child):not(:last-child) {
+        border-bottom: 1px solid $objects-list-element-border-color;
+    }
+}
+
+.objects-list-panel__object, .objects-list-panel__expandable-group-header, .objects-list-panel__object-satellite {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    column-gap: 5px;
+}
+
+.objects-list-panel__object-name {
+    color: $object-header;
+    font-size: 32px;
+    font-weight: 500;
+}
+
+.objects-list-panel__expand-list-icon {
+    width: 40px;
+    height: 40px;
+}
+
+.objects-list-panel__object-satellites-list {
+    display: none;
+
+    width: 80vw;
+    margin-left: 5vw;
+
+    font-size: 24px;
+    font-weight: 500;
+    color: $object-name;
+
+    li:not(:last-child) {
+        border-bottom: 1px solid $objects-list-subitems-border-color;
+    }
+}
+
+.expanded-objects-list {
+    display: initial;
+}
+
+.objects-list-panel__object-satellite, .objects-list-panel__expandable-group-header, .objects-list-panel__object {
+    &:hover {
+        background-color: $objects-list-element-hover-bg;
+    }
+
+    padding: 10px 0;
+}
+
+.objects-list-panel__expand-list-icon {
+    transform: rotate(-90deg);
+}
+
+.objects-list-panel__close-icon-container {
+    position: absolute;
+    top: 1vh;
+    right: 1vw;
+    width: 32px;
+    height: 32px;
+
+    border-radius: 5px;
+}
+
+.objects-list-panel__close-icon path {
+    stroke: $objects-list-close-icon-color;
+}
+
+// .objects-list-panel__object--expandable:hover > ul {
+//     display: initial;
+// }

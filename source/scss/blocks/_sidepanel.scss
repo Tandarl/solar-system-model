@@ -1,0 +1,333 @@
+.side-panel {
+    width: 25vw;
+    height: 100vh;
+    // background-color: $side-panel-bg;
+    background: rgba(255,255,255,0.1);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    padding: 20px 25px 0;
+
+    font-family: "Exo 2", sans-serif;
+
+    z-index: 105;
+}
+
+.side-panel__top-line-container {
+    display: block;
+}
+
+.side-panel__top-lines {
+    li + li {
+        display: block;
+        margin-top: 10px;
+    }
+}
+
+.side-panel__top-lines-row{
+    display: flex;
+    justify-content: space-between;
+}
+
+.side-panel__object-name {
+    font-size: 36px;
+    font-weight: bold;
+    color: $object-header;
+}
+
+.side-panel__object-type {
+    font-size: 16px;
+    font-weight: bold;
+    color: $accent; 
+    text-transform: uppercase;
+}
+
+.side-panel__chapters-group-list {
+    margin-top: 30px;
+
+    div + div {
+        margin-top: 25px;
+    }
+}
+
+// Chapters
+.chapter {
+    .side-panel__chapter-header-line {
+        display: flex;
+        align-items: center;
+        column-gap: 5px;
+        cursor: pointer;
+    }
+
+
+    .folded-chapter-plus-sign {
+        margin-bottom: 5px;
+    }
+}
+
+    // Folded chapter
+.folded-chapter {
+    cursor: pointer;
+
+    transition: background-color 0.2s ease-in-out;    
+    &:hover {
+        background-color: $folded-chapter-hover-bg;
+    }
+
+    .folded-chapter-plus-sign {
+        margin-bottom: -1px;
+    }
+
+    .side-panel__chapter-header {
+        margin-bottom: 3px;
+    }
+    margin-top: 10px;
+    border-bottom: 1px solid $folded-chapter-outline;
+
+}
+
+.side-panel__chapter-header {
+    font-weight: bold;
+    font-size: 20px;
+    color: $chapter-header;
+
+    margin-bottom: 10px;
+}
+    // Description chapter
+
+.side-panel__object-description-paragraph {
+    font-weight: lighter;
+    font-size: 18px;
+    color: $plain-text;
+
+    margin-bottom: 10px;
+}
+
+.side-panel__chapter-collapse-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    column-gap: 10px;
+ 
+    padding: 1em;
+    height: 30px;
+    border-radius: 5px;
+    background: $button-bg;
+ 
+    font-size: 18px;
+    color: $button-text-icon;
+
+    margin-top: 30px;
+   
+    transition: background-color 0.2s ease-in, color 0.2s ease-in;
+ 
+    &:hover, &:focus {
+    background-color: #3d3d3d;
+    } 
+    
+    &:active {
+    background-color: #222222;
+    }
+}
+
+    // Features chapter
+
+.side-panel__object-features-groups-list {
+    ul + ul {
+        margin-top: 25px;
+    }
+}
+
+.side-panel__object-features-group li:nth-of-type(n) {
+    color: $plain-text;
+}
+
+.side-panel__object-features-group li:nth-of-type(2n) {
+    color: $features-list-visual-highlight;
+}
+
+.side-panel__object-features-group .side-panel__object-feature + .side-panel__object-feature {
+    margin-top: 8px;
+}
+
+.side-panel__object-features-group-header {
+    font-weight: 600;
+    font-size: 16px;
+    color: $group-header;
+    margin-bottom: 10px;
+}
+
+.side-panel__object-feature {
+    display: flex;
+    column-gap: 10px;
+}
+
+.side-panel__object-feature-name {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.side-panel__object-feature-value {
+    font-size: 16px;
+    font-weight: 300;
+}
+
+.side-panel__panel-collapse-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 36px;
+    height: 36px;
+    
+    border-radius: 5px;
+
+    transition: background-color 0.1s ease-in, box-shadow 0.2s ease-in;
+    &:hover {
+        background-color: $button-bg;
+        -webkit-box-shadow: 0px 0px 4px 3px $button-bg;
+        -moz-box-shadow: 0px 0px 4px 3px $button-bg;
+        box-shadow: 0px 0px 4px 3px $button-bg;
+    }
+}
+
+.collapse-panel-icon--horizontal-panel {
+    width: 32px;
+    height: 32px;
+}
+
+.side-panel__horizontal-panel-collapse-button {
+    width: auto;
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: rotate(270deg);
+
+    border-radius: 15%;
+    background-color: $button-bg;
+
+    display: none;
+}
+
+// Expand panel buttons
+.expand-side-panel-button {
+    display: block;
+    padding-left: 1px;
+    height: 32px;
+    margin: 25px;
+
+    border-radius: 5px;
+
+    z-index: 10;
+
+    .expand-side-panel-icon {
+        width: 32px;
+        height: 32px;
+
+        transform: rotate(180deg);
+    }
+}
+
+// Media queries
+// Tablet
+@media(max-width: 1000px) {
+    .ui-overlay {
+        flex-direction: column-reverse;
+        align-items: end;
+
+        padding: 20px 15px 0;
+    }
+
+    .side-panel {
+        width: calc(100vw - 30px);
+        height: 38vh;
+    }
+
+    .side-panel__top-line-container {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .side-panel__top-lines {
+        display: flex;
+        column-gap: 30px;
+        align-items: center;
+    }
+
+
+    // Vertical panel collapse and expand buttons are being hidden
+    .side-panel__top-line-сontainer {
+        position: relative;
+    }
+
+    .side-panel__panel-collapse-button {
+        display: block;
+        position: absolute;
+        right: 0;
+
+        transform: rotate(-90deg);
+    }
+
+    .expand-side-panel-button {
+        display: block;
+        position: absolute;
+
+        bottom: 10px;
+        right: 10px;
+
+        transform: rotate(-90deg);
+    }
+
+    .side-panel__chapters-group-list {
+        margin-top: 5px;
+    }
+
+    // Chapters
+    // Features chapter
+    .side-panel__object-features-group {
+        * {
+            font-size: 20px;
+        }
+
+        .side-panel__object-feature {
+            column-gap: 20px;
+        }
+    }
+
+    // Top right menu
+    .top-right-menu {
+        margin: 0;
+    }
+}
+
+// Mobile
+@media (max-width: 480px) {
+    .side-panel {
+        padding: 15px;
+    }
+
+    .side-panel__object-name {
+        font-size: 34px;
+    }
+
+    .side-panel__object-type {
+        font-size: 14px;
+    }
+    
+    .side-panel__chapter-header {
+        font-size: 18px;
+    }
+
+    .folded-chapter-plus-sign {
+        width: 16px;
+        height: 16px;
+    }
+
+    .side-panel__object-description-paragraph {
+        font-size: 16px;
+    }
+}
