@@ -1,19 +1,100 @@
 .side-panel {
-    width: 25vw;
+    width: 27vw;
     height: 100vh;
-    // background-color: $side-panel-bg;
-    background: rgba(255,255,255,0.1);
+    background: $side-panel-bg;
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
 
     overflow-y: auto;
     overflow-x: hidden;
 
-    padding: 20px 25px 0;
+    padding: 10px 15px 0;
 
     font-family: "Exo 2", sans-serif;
 
-    z-index: 105;
+    z-index: 10;
+}
+
+.side-panel__collapse-button-container {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    float: right;
+}
+
+.side-panel__tabs {
+
+    isolation: isolate;
+
+    display: flex;
+    justify-content: space-around;
+    height: 3.5rem;
+    width: 100%;
+    border-block-end: 1px solid rgb(170, 170, 170);
+    
+    margin-top: 50px;
+
+    // Скрытие радиокнопок
+    input {
+        display: none;
+    }
+
+    // Настройка текста вкладок
+    label {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        color: $tabs-label-unfocus;
+        font-size: 20px;
+        font-weight: 600;
+        
+        cursor: pointer;
+
+        transition: color 0.5s ease-in-out;
+
+        &::after {
+            pointer-events: none;
+            position: absolute;
+            inset: 0 0 0 -10%;
+            content: "";
+            width: 120%;
+            // border: 1px solid #FFFFFF;
+            border-radius: 0.5rem 0.5rem 0 0;
+            border-block-end: none;
+            background-color: $active-tab-bg;
+
+            z-index: -1; 
+        }
+    }
+    // Заголовок выбранной вкладки становится более ярким
+    input:checked + label {
+        color: $tabs-label-focus;
+
+        &::after {
+            height: 100%;
+            border-left: 1px solid rgb(170, 170, 170);
+            border-right: 1px solid rgb(170, 170, 170);
+            border-top: 1px solid rgb(170, 170, 170);
+
+        }
+    }
+
+}
+
+// Контент неактивных вкладок скрывается
+.side-panel_description-content,
+.side-panel_characteristics-content,
+.side-panel_instruments-content {
+    display: none;
+}
+
+// Отображается контента только выбранной вкладки
+.side-panel:has(:checked:nth-of-type(1)) .tab-content-1,
+.side-panel:has(:checked:nth-of-type(2)) .tab-content-2,
+.side-panel:has(:checked:nth-of-type(3)) .tab-content-3 {
+        display: block;
 }
 
 .side-panel__top-line-container {
@@ -27,7 +108,7 @@
     }
 }
 
-.side-panel__top-lines-row{
+.side-panel__top-lines-row {
     display: flex;
     justify-content: space-between;
 }
@@ -45,7 +126,7 @@
     text-transform: uppercase;
 }
 
-.side-panel__chapters-group-list {
+.side-panel_tabs-content {
     margin-top: 30px;
 
     div + div {
@@ -55,6 +136,8 @@
 
 // Chapters
 .chapter {
+    margin-top: 5px;
+
     .side-panel__chapter-header-line {
         display: flex;
         align-items: center;
@@ -175,6 +258,40 @@
     font-weight: 300;
 }
 
+// Список инструментов
+
+.side-panel__instruments-list {
+    li {
+        border-bottom: 1px solid $instrument-border-color;
+        cursor: pointer;
+    }
+}
+
+.side-panel__instrument {
+    width: 100%;
+    height: 4.3em;
+    margin: 0;
+    padding-left: 1em;
+    display: flex;
+    align-items: center;
+    justify-content: left;
+
+    transition: background-color 0.1s ease-in;
+
+    &:hover {
+        background-color: $instrument-hover-bg;
+    }
+}
+
+.side-panel_instrument-icon-container {
+    margin-right: 15px;
+}
+
+.side-panel__instrument-name {
+    font-size: 20px;
+    color: $plain-text;
+}
+
 .side-panel__panel-collapse-button {
     display: flex;
     justify-content: center;
@@ -219,6 +336,8 @@
     padding-left: 1px;
     height: 32px;
     margin: 25px;
+
+    cursor: pointer;
 
     border-radius: 5px;
 

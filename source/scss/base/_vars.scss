@@ -1,10 +1,12 @@
 // Colors
     // Background colors
         // Side panel background colors
-        $side-panel-bg: rgba(#272527, 0.7);
-        $button-bg: #343434;
+        $side-panel-bg: rgba(255,255,255,0.1);
+        $button-bg: #343434a4;
         $side-panel-scroll-line: #FFFFFF;
         $folded-chapter-hover-bg: #313131;
+        $instrument-hover-bg: #313131;
+        $active-tab-bg: transparent;
 
         // Top right menu background colors
         $search-panel-bg: rgba(#676767, 0.45);
@@ -20,12 +22,17 @@
         $objects-list-subitems-border-color: rgba(#dbdbdb, 0.2);
         $objects-list-close-icon-color: rgba(#FFFFFF, 0.7);
 
+        // Instrument list border color
+        $instrument-border-color: rgba(#dbdbdb, 0.3);
+
 
 
     //Text colors
         // Side panel text colors
         $object-header: #FFFFFF;
         $chapter-header: #FFFFFF;
+        $tabs-label-unfocus: rgba(255, 255, 255, 0.5);
+        $tabs-label-focus: #ffffff;
         $button-text-icon: #ABABAB;
         $features-list-visual-highlight: #8ea3d8;
         $plain-text: #FFFFFF;

@@ -15,60 +15,90 @@
 </head>
 <body>
     <main id="side-panel" class="side-panel">
-        <div class="side-panel__top-line-сontainer container">
-            <ul class="side-panel__top-lines">
-                <li class="side-panel__top-lines-row">
-                    <h1 id="side-panel__object-name" class="side-panel__object-name">Объект</h1>
-                    <button id="side-panel__collapse-button" class="side-panel__panel-collapse-button icon-button-desktop"><img class="collapse-panel-icon" src="./assets/icons/arrows_icon.svg" alt="collapse"></button>
-                </li>
-                <li>
-                    <h3 id="side-panel__object-type" class="side-panel__object-type">Тип объекта</h3>
-                </li>
-            </ul>
+        <div class="side-panel__collapse-button-container">
+            <button id="side-panel__collapse-button" class="side-panel__panel-collapse-button icon-button-desktop"><img class="collapse-panel-icon" src="./assets/icons/arrows_icon.svg" alt="collapse"></button>
         </div>
-        <div class="side-panel__chapters-group-list">
-            <div id="side-panel__object-description" class="side-panel__object-description chapter">
-                <div id="side-panel__object-description__expand-button" class="side-panel__chapter-header-line">
-                    <h2 class="side-panel__chapter-header">Описание</h2>
-                    <img id="folded-description-chapter-plus-sign" class="folded-chapter-plus-sign hidden" src="./assets/icons/plus_sign.svg" alt="expand">
+
+        <div class="side-panel__tabs">
+            <input type="radio" id="description" name="tabs" checked>
+            <label class="side-panel__tab-label" for="description">Описание</label>
+
+            <input type="radio" id="characteristics" name="tabs">
+            <label class="side-panel__tab-label" for="characteristics">Характеристики</label>
+
+            <input type="radio" id="instruments" name="tabs">
+            <label class="side-panel__tab-label" for="instruments">Инструменты</label>
+        </div>
+
+        <div class="side-panel__tabs-content">
+            <div class="tab-content-1 side-panel_description-content">
+                <div class="side-panel__top-line-сontainer container">
+                    <ul class="side-panel__top-lines">
+                        <li class="side-panel__top-lines-row">
+                            <h1 id="side-panel__object-name" class="side-panel__object-name">Объект</h1>
+                        </li>
+                        <li>
+                            <h3 id="side-panel__object-type" class="side-panel__object-type">Тип объекта</h3>
+                        </li>
+                    </ul>
                 </div>
-                <p id="side-panel__object-description-paragraph" class="side-panel__object-description-paragraph">test test</p>
-                <button id="side-panel__object-description__collapse-button" class="side-panel__chapter-collapse-button">Скрыть</button>
+                <div id="side-panel__object-description" class="side-panel__object-description chapter">
+                    <div id="side-panel__object-description__expand-button" class="side-panel__chapter-header-line">
+                        <h2 class="side-panel__chapter-header">Описание</h2>
+                        <img id="folded-description-chapter-plus-sign" class="folded-chapter-plus-sign hidden" src="./assets/icons/plus_sign.svg" alt="expand">
+                    </div>
+                    <p id="side-panel__object-description-paragraph" class="side-panel__object-description-paragraph"></p>
+                    <button id="side-panel__object-description__collapse-button" class="side-panel__chapter-collapse-button">Скрыть</button>
+            </div>
+            </div>
+            <div class="tab-content-2 side-panel_characteristics-content">
+                <div id="side-panel__object-features" class="side-panel__object-features chapter">
+                    <div id="side-panel__object-features__expand-button" class="side-panel__chapter-header-line">
+                        <h2 class="side-panel__chapter-header">Характеристики небесного тела</h2>
+                        <img id="folded-features-chapter-plus-sign" class="folded-chapter-plus-sign hidden" src="./assets/icons/plus_sign.svg" alt="expand">
+                    </div>
+                    <ul id="side-panel__object-features-groups-list" class="side-panel__object-features-groups-list">
+                        <ul id="side-panel__celestial-body-features-list" class="side-panel__object-features-group">
+                            <h4 class="side-panel__object-features-group-header">Группа 1</h4>
+
+                            <li class="side-panel__object-feature">
+                                <span class="side-panel__object-feature-name">Feature 1:</span>
+                                <span class="side-panel__object-feature-value">Value 1</span>
+                            </li>
+                            <li class="side-panel__object-feature">
+                                <span class="side-panel__object-feature-name">Feature 2:</span>
+                                <span class="side-panel__object-feature-value">Value 1</span>
+                            </li>
+                        </ul>
+                        <ul id="side-panel__orbit-features-list" class="side-panel__object-features-group">
+                            <h4 class="side-panel__object-features-group-header">Группа 2</h4>
+
+                            <li class="side-panel__object-feature">
+                                <span class="side-panel__object-feature-name">Feature 1:</span>
+                                <span class="side-panel__object-feature-value">Value 1</span>
+                            </li>
+                            <li class="side-panel__object-feature">
+                                <span class="side-panel__object-feature-name">Feature 2:</span>
+                                <span class="side-panel__object-feature-value">Value 2</span>
+                            </li>
+                        </ul>
+                    </ul>
+                    <button id="side-panel__object-features__collapse-button" class="side-panel__chapter-collapse-button">Скрыть</button>
+                </div>
+            </div>
+            <div class="tab-content-3 side-panel_instruments-content">
+                <ul class="side-panel__instruments-list">
+                    <li class="side-panel__instrument">
+                        <div class="side-panel_instrument-icon-container"><img class="side-panel__instrument-icon" src="./assets/icons/compare_weighs.svg"></div>
+                        <p class="side-panel__instrument-name">Сравнить размеры</p>
+                    </li>
+                    <li class="side-panel__instrument">
+                        <div class="side-panel_instrument-icon-container"><img class="side-panel__instrument-icon" src="./assets/icons/distance_measure.svg"></div>
+                        <p class="side-panel__instrument-name">Измерить расстояние</p>
+                    </li>
+                </ul>
             </div>
             <!-- Folded-chapter should be a toggled class  -->
-            <div id="side-panel__object-features" class="side-panel__object-features chapter">
-                <div id="side-panel__object-features__expand-button" class="side-panel__chapter-header-line">
-                    <h2 class="side-panel__chapter-header">Характеристики</h2>
-                    <img id="folded-features-chapter-plus-sign" class="folded-chapter-plus-sign hidden" src="./assets/icons/plus_sign.svg" alt="expand">
-                </div>
-                <ul id="side-panel__object-features-groups-list" class="side-panel__object-features-groups-list">
-                    <ul id="side-panel__celestial-body-features-list" class="side-panel__object-features-group">
-                        <h4 class="side-panel__object-features-group-header">Группа 1</h4>
-
-                        <li class="side-panel__object-feature">
-                            <span class="side-panel__object-feature-name">Feature 1:</span>
-                            <span class="side-panel__object-feature-value">Value 1</span>
-                        </li>
-                        <li class="side-panel__object-feature">
-                            <span class="side-panel__object-feature-name">Масса:</span>
-                            <span class="side-panel__object-feature-value">100 кг</span>
-                        </li>
-                    </ul>
-                    <ul id="side-panel__orbit-features-list" class="side-panel__object-features-group">
-                        <h4 class="side-panel__object-features-group-header">Группа 2</h4>
-
-                        <li class="side-panel__object-feature">
-                            <span class="side-panel__object-feature-name">Feature 1:</span>
-                            <span class="side-panel__object-feature-value">Value 1</span>
-                        </li>
-                        <li class="side-panel__object-feature">
-                            <span class="side-panel__object-feature-name">Feature 2:</span>
-                            <span class="side-panel__object-feature-value">Value 2</span>
-                        </li>
-                    </ul>
-                </ul>
-                <button id="side-panel__object-features__collapse-button" class="side-panel__chapter-collapse-button">Скрыть</button>
-            </div>
         </div>
     </main>
     <div id="side-panel__expand-button" class="expand-side-panel-button icon-button-desktop hidden"><img src="./assets/icons/arrows_icon.svg" alt="expand" class="expand-side-panel-icon"></div>
