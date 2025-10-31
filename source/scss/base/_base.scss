@@ -6,7 +6,7 @@ body {
     justify-content: space-between;
 }
 
-@media(max-width: 1000px) {
+@media(max-width: $tablet-max-width) {
     body {
         flex-direction: column-reverse;
         align-items: center;

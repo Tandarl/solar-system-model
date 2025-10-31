@@ -1,5 +1,5 @@
 .side-panel {
-    width: 27vw;
+    width: 29vw;
     height: 100vh;
     background: $side-panel-bg;
     -webkit-backdrop-filter: blur(8px);
@@ -40,14 +40,14 @@
     }
 
     // Настройка текста вкладок
-    label {
+    .side-panel__tab-label {
         position: relative;
         display: flex;
         justify-content: center;
         align-items: center;
 
         color: $tabs-label-unfocus;
-        font-size: 20px;
+        font-size: 1.1cqw;
         font-weight: 600;
         
         cursor: pointer;
@@ -174,7 +174,7 @@
 
 .side-panel__chapter-header {
     font-weight: bold;
-    font-size: 20px;
+    font-size: 25px;
     color: $chapter-header;
 
     margin-bottom: 10px;
@@ -238,7 +238,7 @@
 
 .side-panel__object-features-group-header {
     font-weight: 600;
-    font-size: 16px;
+    font-size: 20px;
     color: $group-header;
     margin-bottom: 10px;
 }
@@ -249,12 +249,12 @@
 }
 
 .side-panel__object-feature-name {
-    font-size: 16px;
+    // font-size: 16px;
     font-weight: 500;
 }
 
 .side-panel__object-feature-value {
-    font-size: 16px;
+    // font-size: 16px;
     font-weight: 300;
 }
 
@@ -353,17 +353,14 @@
 
 // Media queries
 // Tablet
-@media(max-width: 1000px) {
-    .ui-overlay {
-        flex-direction: column-reverse;
-        align-items: end;
-
-        padding: 20px 15px 0;
-    }
-
+@media(max-width: $tablet-max-width ) {
     .side-panel {
         width: calc(100vw - 30px);
         height: 38vh;
+    }
+
+    .side-panel__tabs .side-panel__tab-label {
+        font-size: clamp(12px, 3cqw, 30px);
     }
 
     .side-panel__top-line-container {
@@ -408,9 +405,19 @@
     // Chapters
     // Features chapter
     .side-panel__object-features-group {
-        * {
-            font-size: 20px;
+
+        .side-panel__object-features-group-header {
+            font-size: clamp(16px, 3cqw, 22px);
         }
+
+        .side-panel__object-feature {
+            font-size: clamp(16px, 2.5cqw, 20px);
+        }
+
+
+        // * {
+        //     font-size: 20px;
+        // }
 
         .side-panel__object-feature {
             column-gap: 20px;
@@ -424,7 +431,7 @@
 }
 
 // Mobile
-@media (max-width: 480px) {
+@media (max-width: $mobile-max-width) {
     .side-panel {
         padding: 15px;
     }
