@@ -249,16 +249,14 @@
 }
 
 .side-panel__object-feature-name {
-    // font-size: 16px;
     font-weight: 500;
 }
 
 .side-panel__object-feature-value {
-    // font-size: 16px;
     font-weight: 300;
 }
 
-// Список инструментов
+// Instruments list
 
 .side-panel__instruments-list {
     li {
@@ -413,11 +411,6 @@
         .side-panel__object-feature {
             font-size: clamp(16px, 2.5cqw, 20px);
         }
-
-
-        // * {
-        //     font-size: 20px;
-        // }
 
         .side-panel__object-feature {
             column-gap: 20px;
