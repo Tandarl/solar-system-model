@@ -57,7 +57,7 @@ scene.background = new THREE.CubeTextureLoader()
     const renderer = new THREE.WebGLRenderer({
         canvas, // Описано выше
         antialias: true, // Сглаживание для уменьшения эффекта "лесенок" по краям объектов
-        logarithmicDepthBuffer: true, // Оптимизация буфера глубины (см. текст работы для подробностей)
+        logarithmicDepthBuffer: false, // Оптимизация буфера глубины (см. текст работы для подробностей)
     });
     
     // Инициализация и настройка рендерера для лейблов и маркеров объектов
@@ -103,31 +103,22 @@ scene.background = new THREE.CubeTextureLoader()
     // camera.position.z = 0;
     
     // Инициализация и настройка элементов управления камерой
-    const controls = new OrbitControls(camera, canvas);
-    controls.enabled = false;
-    controls.maxDistance = CAMERA_MAX_DISTANCE;
-    controls.enableDamping = ENABLE_DAMPING;  // Эффект "инерции" при вращении камеры. Дает большую иммерсивность
-    controls.enablePan = ENABLE_PAN; // Отключение возможности изменения центра вращения камеры "перетаскиванием"
-    controls.minDistance = (focusObject.radius / 10000) * 2;
     
-    controls.target.set(0, 0, 0);
-    
-    // Вторые "ложные" камера и элементы управления ею для реализации слежения за движущимся объектом
+    // Вторая "ложная" камера для реализации слежения за движущимся объектом
     const fakeCamera = camera.clone();
     fakeCamera.rotation.set(0, 0, 0);
     console.log("init rotation", camera.rotation, fakeCamera.rotation);
-    const fakeControls = new OrbitControls(fakeCamera, canvas);
-    fakeControls.maxDistance = CAMERA_MAX_DISTANCE;
-    fakeControls.enablePan = ENABLE_PAN;
-    fakeControls.enableDamping = ENABLE_DAMPING;
-    fakeControls.zoomSpeed = 8;
-    fakeControls.minDistance = (focusObject.radius / 10000) * 2;
+    const controls = new OrbitControls(fakeCamera, canvas);
+    controls.maxDistance = CAMERA_MAX_DISTANCE;
+    controls.enablePan = ENABLE_PAN; // Отключение возможности изменения центра вращения камеры "перетаскиванием"
+    controls.enableDamping = ENABLE_DAMPING; // Эффект "инерции" при вращении камеры. Дает большую иммерсивность
+    controls.zoomSpeed = 8;
+    controls.minDistance = (focusObject.radius / 10000) * 2;
 
 
     // Инициализация часов (см. renderLoop для деталей)
     const clock = new THREE.Clock();
     let PreviousTime = 0;
-
     let delta;
 
 
@@ -139,7 +130,6 @@ scene.background = new THREE.CubeTextureLoader()
     // от радиуса объекта
     function updateControlsParams() {
         controls.minDistance = (focusObject.radius / 10000) * 2;
-        fakeControls.minDistance = (focusObject.radius / 10000) * 2;
     }
 
     
@@ -158,21 +148,17 @@ scene.background = new THREE.CubeTextureLoader()
 
     function changeFocusedObject() {
         SidePanel.ChangeContent(focusObject.id);
+        updateControlsParams();
         
         focusObject.auxiliaryCubeMesh.add(camera);
-        // controls.target = camera.parent.position;
-        updateControlsParams();
 
-        // fakeCamera.rotateX = 0;
-        // fakeCamera.rotateY = 0;
-        // fakeCamera.rotateZ = 0;
-        fakeCamera.position.x = controls.minDistance;
-        fakeCamera.position.y = controls.minDistance;
-        fakeCamera.position.z = controls.minDistance;
-
-        camera.copy(fakeCamera);
+        controls.reset();
         
-
+        fakeCamera.position.x = -1;
+        fakeCamera.position.y = 0;
+        fakeCamera.position.z = controls.minDistance;
+        
+        camera.copy(fakeCamera);
         console.log(fakeCamera.rotation);
     }
 
@@ -192,7 +178,6 @@ scene.background = new THREE.CubeTextureLoader()
         PreviousTime = currentTime;
 
         // Обновление состояния элементов управления
-        fakeControls.update();
         controls.update();
 
         // Обновление состояния объектов в модели
