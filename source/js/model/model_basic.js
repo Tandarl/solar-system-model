@@ -74,8 +74,8 @@ scene.background = new THREE.CubeTextureLoader()
     
     
     // Заполняющий свет, чтобы неосвещенные участки планет не были просто черными пятнами
-    const AmbientLight = new THREE.AmbientLight(0xffffff, 0.015);
-    scene.add(AmbientLight);
+    const AmbientLighting = new THREE.AmbientLight(0xffffff, 0.015);
+    scene.add(AmbientLighting);
 
     // Добавление объектов на сцену
     function init() {
@@ -160,6 +160,7 @@ scene.background = new THREE.CubeTextureLoader()
         
         camera.copy(fakeCamera);
         console.log(fakeCamera.rotation);
+        console.log(renderer.info);
     }
 
 // [-------] Функции обновления состояния камеры и инструментов управления [-------]
@@ -205,6 +206,8 @@ scene.background = new THREE.CubeTextureLoader()
     init();
     updateControlsParams();
     renderLoop();
+
+    console.log(renderer.info);
 
 // [-------] Вызов функций инициализации и активация цикла отрисовки [-------]
 

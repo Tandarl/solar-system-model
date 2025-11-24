@@ -4,6 +4,9 @@ import { MathUtils } from 'three';
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
 import {CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 import { changeFocusedObject } from './model_basic';
+// Shaders
+import fragmentShader from "../../shaders/sun/fragment.glsl";
+import vertexShader from "../../shaders/sun/vertex.glsl";
 
 // radius, tilt, albedo, normalMap, specularMap
 
@@ -28,10 +31,11 @@ class CelestialBody {
         }
 
         
-        this.geometry = new THREE.IcosahedronGeometry(obj.radius/10000, 12);
+        this.geometry = new THREE.IcosahedronGeometry(obj.radius/10000, 10);
 
-        this.material = new THREE.MeshStandardMaterial({
-            map: textureLoader.load(`./assets/textures/${obj.id}/texture.jpg`),
+        this.material = new THREE.ShaderMaterial({
+            // map: textureLoader.load(`./assets/textures/${obj.id}/texture.jpg`),
+            // flatShading: true, Toggle to show polygons
             //  wireframe: true // Toggle to show geometry
         });
         
@@ -102,13 +106,14 @@ class CelestialBody {
     }
 }
 
-
 class Star extends CelestialBody {
     constructor(obj) {
         super(obj);
 
-        this.material = new THREE.MeshBasicMaterial({
-            map: textureLoader.load(`./assets/textures/${obj.id}/texture.jpg`),
+        this.material = new THREE.ShaderMaterial({
+            vertexShader: vertexShader,
+            fragmentShader: fragmentShader,
+            // map: textureLoader.load(`./assets/textures/${obj.id}/texture.jpg`),
         });
 
         this.mesh = new THREE.Mesh(this.geometry, this.material);

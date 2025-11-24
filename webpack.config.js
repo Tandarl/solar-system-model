@@ -6,9 +6,16 @@ const CopyPlugin = require("copy-webpack-plugin");
 module.exports = (env) => {
     return {
         mode: env.mode,
-        devtool: false,
+        devtool: 'source-map',
         module: {
             rules: [
+                {
+                    test: /\.(glsl|vs|fs|vert|frag)$/,
+                    exclude: /node_modules/,
+                    use: [
+                        'webpack-glsl-loader',
+                    ]
+                },
                 {
                     test: /\.scss$/i,
                     exclude: /node_modules/,
