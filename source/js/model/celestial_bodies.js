@@ -3,10 +3,37 @@ import {DBAPI} from '../database/data_base_api';
 import { MathUtils } from 'three';
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
 import {CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
-import { changeFocusedObject } from './model_basic';
-// Shaders
-import fragmentShader from "../../shaders/sun/fragment.glsl";
-import vertexShader from "../../shaders/sun/vertex.glsl";
+import { changeFocusedObject} from './model_basic';
+
+// Шейдеры
+    // [-------] Uniforms для шейдеров [-------]
+
+    const uniformData = {
+        u_time: {
+            type: 'f',
+            value: 0.0,
+        },
+        uvScale: { 
+            value: new THREE.Vector2(3.0, 1.0) 
+        },
+    }
+
+    // [-------] Uniforms для шейдеров [-------]
+    // import { uniformData } from './model_basic.js';
+
+    // Солнце
+    import sunFragmentShader from "../../shaders/sun/fragment.glsl";
+    import sunVertexShader from "../../shaders/sun/vertex.glsl";
+
+    // Земля
+    import earthFragmentShader from "../../shaders/earth/fragment.glsl";
+    import earthVertexShader from "../../shaders/earth/vertex.glsl";
+
+    // Тестовые шейдеры
+    import testFragmentShader from "../../shaders/test/fragment.glsl";
+    import testVertexShader from "../../shaders/test/vertex.glsl";
+
+
 
 // radius, tilt, albedo, normalMap, specularMap
 
@@ -111,10 +138,14 @@ class Star extends CelestialBody {
         super(obj);
 
         this.material = new THREE.ShaderMaterial({
-            vertexShader: vertexShader,
-            fragmentShader: fragmentShader,
+            uniforms: uniformData,
+            vertexShader:  sunVertexShader,
+            fragmentShader: sunFragmentShader,
+            // wireframe: true,
             // map: textureLoader.load(`./assets/textures/${obj.id}/texture.jpg`),
         });
+
+        console.log(this.geometry);
 
         this.mesh = new THREE.Mesh(this.geometry, this.material);
         this.mesh.rotation.z = MathUtils.degToRad(obj.tilt);
@@ -158,6 +189,11 @@ class Star extends CelestialBody {
 class Planet extends CelestialBody {
     constructor(obj) {
         super(obj);
+
+        this.geometry = new THREE.SphereGeometry(obj.radius / 10000, 30, 30);
+        
+        this.material = new THREE.ShaderMaterial({});
+
         this.markerColor = modelOrbitsAndIconsColors[this.id % 9];
         
         this.SpeedParams.OrbitalVelocity = (obj.orbit_parameters["орбитальная скорость"].replace(/[^\d.-]/g, '')) / (obj.mediumDistanceFromParentObject); 
@@ -171,27 +207,36 @@ class Planet extends CelestialBody {
         
         // Карта нормалей нужна для обеспечения более точного взаимодействия света с объектом без изменения
         // геометрии самого объекта, например, создание эффекта глубины / высоты рельефа, более правильное отбрасывание теней рельефом поверхности.
-        if(obj.id <= 4) {
-            // Поскольку планеты, идущие после марса являются газовыми гигантами и, соответственно, не имеют рельефа, а значит карта нормалей для них не нужна
-            this.material.normalMap = textureLoader.load(`./assets/textures/${obj.id}/normalMap.jpg`);
-        }
+        // if(obj.id <= 4) {
+        //     // Поскольку планеты, идущие после марса являются газовыми гигантами и, соответственно, не имеют рельефа, а значит карта нормалей для них не нужна
+        //     // [------] OLD STYLING [------]
+        //     // this.material.normalMap = textureLoader.load(`./assets/textures/${obj.id}/normalMap.jpg`);
+        // }
 
         if(obj.id == 3) {
             /* Поскольку большая часть поверхности Земли покрыта водой, которая отражает свет значительно лучше, чем суша, то
              к её текстуре целесообразно применить карту отражений */
-            this.material.reflectivityMap = textureLoader.load(`./assets/textures/${obj.id}/specularMap.jpg`);
 
-            this.cloudsMaterial = new THREE.MeshStandardMaterial({
-                map: textureLoader.load(`./assets/textures/${obj.id}/clouds.jpg`),
-                blending: THREE.AdditiveBlending, // Использование метода смешивания пересекающихся текстур
-                transparent: 0.7
+            this.material = new THREE.ShaderMaterial({
+                vertexShader: earthVertexShader,
+                fragmentShader: earthFragmentShader,
+                // map: textureLoader.load(`./assets/textures/${obj.id}/texture.jpg`),
             });
+
+            // [------] OLD EARTH STYLING [------]
+            // this.material.reflectivityMap = textureLoader.load(`./assets/textures/${obj.id}/specularMap.jpg`);
+
+            // this.cloudsMaterial = new THREE.MeshStandardMaterial({
+            //     map: textureLoader.load(`./assets/textures/${obj.id}/clouds.jpg`),
+            //     blending: THREE.AdditiveBlending, // Использование метода смешивания пересекающихся текстур
+            //     transparent: 0.7
+            // });
             
-            this.cloudsMesh = new THREE.Mesh(this.geometry, this.cloudsMaterial);
-            this.cloudsMesh.rotation.z = MathUtils.degToRad(obj.tilt);
-            this.cloudsMesh.scale.setScalar(1.01);
-            this.cloudsMesh.position.set(this.distance, 0, 0);
-            this.planetGroup.add(this.cloudsMesh);
+            // this.cloudsMesh = new THREE.Mesh(this.geometry, this.cloudsMaterial);
+            // this.cloudsMesh.rotation.z = MathUtils.degToRad(obj.tilt);
+            // this.cloudsMesh.scale.setScalar(1.01);
+            // this.cloudsMesh.position.set(this.distance, 0, 0);
+            // this.planetGroup.add(this.cloudsMesh);
         }
 
         if(obj.id >= 6 && obj.id < 10) {
@@ -216,6 +261,9 @@ class Planet extends CelestialBody {
             
             this.planetGroup.add(this.ringsMesh);
         }
+
+        // Применение соответствующих материалов к мешам
+        this.mesh.material = this.material;
         
         this.mesh.position.set(this.distance, 0, 0);
 
@@ -262,7 +310,6 @@ class Planet extends CelestialBody {
 
     UpdatePosition(delta) {
         this.planetGroup.rotation.y += this.SpeedParams.OrbitalVelocity * delta * timeSpeed;
-
     }
 
     UpdateRotation(delta) {
@@ -304,7 +351,7 @@ let focusObject = celestialBodiesMeshesList[0];
 console.log(`focusObject:`, focusObject);
 
 
-export {celestialBodiesMeshesList, focusObject};
+export {celestialBodiesMeshesList, focusObject, uniformData};
 
 
 /* 
@@ -315,4 +362,4 @@ export {celestialBodiesMeshesList, focusObject};
 	false,            // aClockwise
 	0                 // aRotation
 );
-*/
+*/ 

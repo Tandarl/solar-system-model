@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 import Stats from 'three/addons/libs/stats.module.js';
-import { celestialBodiesMeshesList, focusObject } from "./celestial_bodies";
+import { celestialBodiesMeshesList, focusObject, uniformData } from "./celestial_bodies";
 import { SidePanel } from "../ui/side_panel";
 
 
@@ -14,7 +14,6 @@ const ENABLE_DAMPING = true;
 const ENABLE_PAN = false;
 
 // [-------] Глобальные константы конфигурации [-------]
-
 
 // [-------] Инструменты для разработки [-------]
 
@@ -116,12 +115,6 @@ scene.background = new THREE.CubeTextureLoader()
     controls.minDistance = (focusObject.radius / 10000) * 2;
 
 
-    // Инициализация часов (см. renderLoop для деталей)
-    const clock = new THREE.Clock();
-    let PreviousTime = 0;
-    let delta;
-
-
 // [-------] Конец базовой организации модели [-------]
 
 // [-------] Функции обновления состояния камеры и инструментов управления [-------]
@@ -167,6 +160,16 @@ scene.background = new THREE.CubeTextureLoader()
 
 // Сферическая система координат (см. статью Википедии)
 
+// [-------] Инициализация часов (см. renderLoop для деталей) [-------]
+
+const clock = new THREE.Clock();
+let PreviousTime = 0;
+let delta;
+
+uniformData.u_time.value = clock.getElapsedTime();
+
+// [-------] Инициализация часов [-------]
+
 // [-------] Цикл renderLoop [-------]
 
     const renderLoop = () => {
@@ -192,7 +195,7 @@ scene.background = new THREE.CubeTextureLoader()
         renderer.render(scene, camera);
         labelRenderer.render(scene, camera);
 
-
+        uniformData.u_time.value = clock.getElapsedTime();
         stats.end();
         // Функция вызывает сама себя, причем при помощи метода requestAnimationFrame
         // достигается баланс между приемлемой частотой кадров и нагрузкой на систему
@@ -210,5 +213,7 @@ scene.background = new THREE.CubeTextureLoader()
     console.log(renderer.info);
 
 // [-------] Вызов функций инициализации и активация цикла отрисовки [-------]
+
+
 
     export {scene, camera, changeFocusedObject}
