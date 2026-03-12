@@ -1,11 +1,7 @@
 precision mediump float;
 uniform float u_time;
-uniform vec2 u_resolution;
-varying vec2 vUv;
 varying vec3 vPosition;
 
-varying vec3 vNormal;
-varying vec3 pixelPosition;
 
 vec4 mod289(vec4 x) {
   return x - floor(x * (1.0 / 289.0)) * 289.0; }
@@ -144,23 +140,23 @@ float fbm(vec4 p) {
     return sum;
 }
 
-// Other variant
-// float fbm(vec4 p) {
-//     float sum = 0.0;
+/* Other variant
+ float fbm(vec4 p) {
+     float sum = 0.0;
 
-//     float amplitude = .5;
+     float amplitude = .5;
 
 
-//     for(int i = 0; i < 5; i++) {
-//         sum += snoise(p)*amplitude;
-//         // Смещение каждой последующей октавы во времени для получения паттерна шума, отличного от предыдущего
-//         // p.w += 100.;
-//         p *= 2.5;
-//         amplitude *= 0.5;
-//     }
+     for(int i = 0; i < 5; i++) {
+         sum += snoise(p)*amplitude;
+          // Смещение каждой последующей октавы во времени для получения паттерна шума, отличного от предыдущего
+          // p.w += 100.;
+         p *= 2.5;
+         amplitude *= 0.5;
+     }
 
-//     return sum;
-// }
+     return sum;
+} */
 
 vec3 noiseToColor(float n) {
     // vec3 baseColor1 = vec3(0.98, 0.53, 0.01);
@@ -179,33 +175,48 @@ float noiseMix(vec4 p) {
 }
 
 // Other variant
+// 
 // float noiseMix(vec4 p) {
 //     float brownMotion = fbm(p);
 //     return(fbm(p + fbm(p)));
 // }
 
+float CalcFresnel() {
+    vec3 viewDirection = cameraPosition - vPosition;
+    float fresnel = pow((1.05 - clamp(dot(normalize(viewDirection), normalize(vPosition)), 0.0, 0.75)), 3.);
+    return fresnel;
+}
+
 void main() {
 
     // gl_FragColor = vec4(vNormal, 1.);
-    vec4 p = vec4(vPosition/20.0, u_time*0.01);
-    // float noisy = fbm(p);
-
-    vec4 p1 = vec4(vPosition/20., u_time*0.01);
-    // float spots = max(snoise(p1), 0.);
+    vec4 p = vec4(vPosition/18.0, u_time/80.);
 
     float noisePattern = 0.0;
-    // noisePattern = noisePattern*4. + 1.;
     noisePattern = noiseMix(p);
 
     vec3 sunColor = noiseToColor(noisePattern);
+
+    vec3 color = vec3(0., 0., 0.);
+
+    float fresnel = CalcFresnel();
+
+    vec3 resultColor = sunColor + fresnel;
+
+    // Pass as v0 into gl_FragColor to see the fresnel effect only
+    vec3 fresnelOnlyColor = color + fresnel; 
     
 
-    gl_FragColor = vec4(sunColor, 1.);
+    gl_FragColor = vec4(resultColor , 1.);
 }
 
 // Changeable parameters
-    // Number of octaves (i upper limit in the for loop in fbm function)
-    // amplitude and scale of noise (DIFFER BETWEEN OCTAVES) (in fbm function )
-    // Time shift (adding to p.w in for loop in fbm function)
-    // Noise pattern multiplier (multiplying the vNormal in p and p1 in main() )
-    // Speed of different layers of noise (multiplier of u_time in p and p1 in main() )
+    // SUN SURFACE TEXTURE
+        // Number of octaves (i upper limit in the for loop in fbm function)
+        // amplitude and scale of noise (DIFFER BETWEEN OCTAVES) (in fbm function )
+        // Time shift (adding to p.w in for loop in fbm function)
+        // Noise pattern multiplier (multiplying the vNormal in p and p1 in main() )
+        // Speed of different layers of noise (multiplier of u_time in p and p1 in main() )
+
+    // FRESNEL EFFECT
+        // float numbers in CalcFresnel() function
