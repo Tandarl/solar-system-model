@@ -112,7 +112,7 @@ scene.background = new THREE.CubeTextureLoader()
     controls.enablePan = ENABLE_PAN; // Отключение возможности изменения центра вращения камеры "перетаскиванием"
     controls.enableDamping = ENABLE_DAMPING; // Эффект "инерции" при вращении камеры. Дает большую иммерсивность
     controls.zoomSpeed = 8;
-    controls.minDistance = (focusObject.radius / 10000) * 2;
+    controls.minDistance = (focusObject.radius / 10000) * 1.2;
 
 
 // [-------] Конец базовой организации модели [-------]
@@ -122,7 +122,12 @@ scene.background = new THREE.CubeTextureLoader()
     // Функция обновления минимальной дистанции, в зависимости
     // от радиуса объекта
     function updateControlsParams() {
-        controls.minDistance = (focusObject.radius / 10000) * 2;
+        console.log(focusObject);
+        if(focusObject.id == 0) {
+            controls.minDistance = (focusObject.radius / 10000) * 1.2;
+        } else {
+            controls.minDistance = (focusObject.radius / 10000) * 2;
+        }
     }
 
     

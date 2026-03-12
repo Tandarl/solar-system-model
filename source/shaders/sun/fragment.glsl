@@ -201,7 +201,7 @@ void main() {
 
     float fresnel = CalcFresnel();
 
-    vec3 resultColor = sunColor + fresnel;
+    vec3 resultColor = sunColor + (fresnel / 1.3);
 
     // Pass as v0 into gl_FragColor to see the fresnel effect only
     vec3 fresnelOnlyColor = color + fresnel; 
