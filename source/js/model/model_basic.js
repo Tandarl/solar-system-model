@@ -71,6 +71,8 @@ scene.background = new THREE.CubeTextureLoader()
     // Установка размера для потока вывода изображения
     renderer.setSize(window.innerWidth, window.innerHeight);
     
+    console.log("ANISOTROPY", renderer.capabilities.getMaxAnisotropy());
+    
     
     // Заполняющий свет, чтобы неосвещенные участки планет не были просто черными пятнами
     const AmbientLighting = new THREE.AmbientLight(0xffffff, 0.015);
@@ -154,7 +156,11 @@ scene.background = new THREE.CubeTextureLoader()
         
         fakeCamera.position.x = -1;
         fakeCamera.position.y = 0;
-        fakeCamera.position.z = controls.minDistance;
+        if(focusObject.id == 0) {
+            fakeCamera.position.z = (focusObject.radius / 10000) * 2;
+        } else {
+            fakeCamera.position.z = controls.minDistance;
+        }
         
         camera.copy(fakeCamera);
         console.log(fakeCamera.rotation);

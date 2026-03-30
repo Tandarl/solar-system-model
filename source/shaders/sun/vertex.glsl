@@ -1,12 +1,13 @@
 varying vec3 vNormal;
-varying vec3 pixelPosition;
+varying vec3 vPixelPosition;
 varying vec2 vUv;
 varying vec3 vPosition;
 
 
 void main() {
-    vNormal  = mat3(modelMatrix) * normal;
-    pixelPosition = mat3(modelMatrix) * normal;
+    vec3 modelNormal = (modelMatrix * vec4(normal, 0.0)).xyz;
+    vNormal = modelNormal;
+    vPixelPosition = mat3(modelMatrix) * normal;
     vUv = uv;
     vPosition = position;
 

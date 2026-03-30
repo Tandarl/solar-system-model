@@ -4,6 +4,7 @@ import { MathUtils } from 'three';
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
 import {CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 import { changeFocusedObject} from './model_basic';
+import { degToRad } from 'three/src/math/MathUtils.js';
 
 // Шейдеры
     // [-------] Uniforms для шейдеров [-------]
@@ -16,6 +17,9 @@ import { changeFocusedObject} from './model_basic';
         uvScale: { 
             value: new THREE.Vector2(3.0, 1.0) 
         },
+        uSunDirection: {
+            value: new THREE.Vector3(-1.0, 0.0, 0.0)
+        } 
     }
 
     // [-------] Uniforms для шейдеров [-------]
@@ -28,6 +32,9 @@ import { changeFocusedObject} from './model_basic';
     // Земля
     import earthFragmentShader from "../../shaders/earth/fragment.glsl";
     import earthVertexShader from "../../shaders/earth/vertex.glsl";
+
+    import atmosphereFragmentShader from "../../shaders/earth_atmosphere/fragment.glsl";
+    import atmosphereVertexShader from "../../shaders/earth_atmosphere/vertex.glsl";
 
     // Тестовые шейдеры
     import testFragmentShader from "../../shaders/test/fragment.glsl";
@@ -58,7 +65,8 @@ class CelestialBody {
         }
 
         
-        this.geometry = new THREE.IcosahedronGeometry(obj.radius/10000, 10);
+        // this.geometry = new THREE.IcosahedronGeometry(obj.radius/10000, 10);
+        this.geometry = new THREE.SphereGeometry(obj.radius / 10000, 42, 42);
 
         this.material = new THREE.ShaderMaterial({
             // map: textureLoader.load(`./assets/textures/${obj.id}/texture.jpg`),
@@ -173,6 +181,7 @@ class Star extends CelestialBody {
 
     Update(delta) {
         this.UpdateRotation(delta);
+        // console.log(uniformData.uSunDirection);
     }
 
     ToggleFocusState(command) {
@@ -183,14 +192,17 @@ class Star extends CelestialBody {
             changeFocusedObject();
         }
     }
-} 
+    UpdateRotation(delta) {
+        this.mesh.rotation.y += this.SpeedParams.RotationAroundAxisVelocity * delta;
+    }
+}
 
 
 class Planet extends CelestialBody {
     constructor(obj) {
         super(obj);
 
-        this.geometry = new THREE.SphereGeometry(obj.radius / 10000, 30, 30);
+        this.geometry = new THREE.SphereGeometry(obj.radius / 10000, 52, 52);
         
         this.material = new THREE.ShaderMaterial({});
 
@@ -204,6 +216,8 @@ class Planet extends CelestialBody {
 
         // создание группы мешей планеты, в которую позже будут добавлены меши самой планеты, ее орбиты и прочих вспомогательных объектов (см. код ниже для подробностей)
         this.planetGroup = new THREE.Group();
+
+        
         
         // Карта нормалей нужна для обеспечения более точного взаимодействия света с объектом без изменения
         // геометрии самого объекта, например, создание эффекта глубины / высоты рельефа, более правильное отбрасывание теней рельефом поверхности.
@@ -214,14 +228,49 @@ class Planet extends CelestialBody {
         // }
 
         if(obj.id == 3) {
-            /* Поскольку большая часть поверхности Земли покрыта водой, которая отражает свет значительно лучше, чем суша, то
-             к её текстуре целесообразно применить карту отражений */
+            this.textures = {
+                dayTexture: textureLoader.load(`./assets/textures/${obj.id}/texture.jpg`),
+                nightTexture: textureLoader.load(`./assets/textures/${obj.id}/night_texture.jpg`),
+                specularCloudsTexture: textureLoader.load(`./assets/textures/${obj.id}/bump_roughness_clouds.jpg`)
+            }
+            // this.textures.dayTexture.colorSpace = THREE.SRGBColorSpace;
+            this.textures.nightTexture.colorSpace = THREE.SRGBColorSpace;
+            
+            this.textures.dayTexture.anisotropy = 8;
+            this.textures.nightTexture.anisotropy = 8;
+            this.textures.specularCloudsTexture.anisotropy = 8;
+
+            this.AtmosphereDayColor = '#00aaff';
+            this.AtmosphereTwilightColor = '#ff6600';
+
+            uniformData.uEarthDayTexture = new THREE.Uniform(this.textures.dayTexture);
+            uniformData.uEarthNightTexture = new THREE.Uniform(this.textures.nightTexture);
+            uniformData.uEarthSpecularCloudsTexture = new THREE.Uniform(this.textures.specularCloudsTexture);
+            uniformData.uEarthAtmosphereDayColor = new THREE.Uniform(new THREE.Color(this.AtmosphereDayColor)),
+            uniformData.uEarthAtmosphereTwilightColor = new THREE.Uniform(new THREE.Color(this.AtmosphereTwilightColor)),
 
             this.material = new THREE.ShaderMaterial({
                 vertexShader: earthVertexShader,
                 fragmentShader: earthFragmentShader,
+                uniforms: uniformData,
+                // wireframe: true
                 // map: textureLoader.load(`./assets/textures/${obj.id}/texture.jpg`),
             });
+
+            this.atmosphereMaterial = new THREE.ShaderMaterial({
+                vertexShader: atmosphereVertexShader,
+                fragmentShader: atmosphereFragmentShader,
+                uniforms: uniformData,
+                side: THREE.BackSide,
+                transparent: true,
+            });
+            this.atmosphere = new THREE.Mesh(this.geometry, this.atmosphereMaterial);
+            this.atmosphere.scale.set(1.04, 1.04, 1.04);
+            this.atmosphere.position.set(this.distance, 0, 0);
+            this.planetGroup.add(this.atmosphere);
+            console.log("EARTH", this.mesh.position, this.atmosphere.position);
+            
+            this.planetGroup.rotation.y = Math.PI;
 
             // [------] OLD EARTH STYLING [------]
             // this.material.reflectivityMap = textureLoader.load(`./assets/textures/${obj.id}/specularMap.jpg`);
@@ -299,6 +348,11 @@ class Planet extends CelestialBody {
         console.log("distance", this.distance);
         this.sunLightImitator.position.set(this.distance - 1000, 0, 0);
 
+        this.TestCubeGeometry = new THREE.BoxGeometry(100, 100, 100);
+        this.TestCubeMat = new THREE.MeshBasicMaterial({color:0xff0000});
+        this.TestCubeMesh = new THREE.Mesh(this.TestCubeGeometry, this.TestCubeMat);
+        this.TestCubeMesh.position.copy(this.sunLightImitator.position);
+
 
         // Центр группы расположен в точке начала координат, что упрощает реализацию вращения планеты вокруг Солнца
         this.planetGroup.position.set(0, 0, 0);
@@ -306,6 +360,7 @@ class Planet extends CelestialBody {
         this.planetGroup.add(this.orbit);
         this.planetGroup.add(this.auxiliaryCubeMesh);
         this.planetGroup.add(this.sunLightImitator);
+        this.planetGroup.add(this.TestCubeMesh);
     }
 
     UpdatePosition(delta) {

@@ -1,6 +1,7 @@
 precision mediump float;
 uniform float u_time;
 varying vec3 vPosition;
+varying vec3 vNormal;
 
 
 vec4 mod289(vec4 x) {
@@ -182,9 +183,9 @@ float noiseMix(vec4 p) {
 // }
 
 float CalcFresnel() {
-    vec3 viewDirection = cameraPosition - vPosition;
-    float fresnel = pow((1.05 - clamp(dot(normalize(viewDirection), normalize(vPosition)), 0.0, 0.75)), 3.);
-    return fresnel;
+    vec3 viewDirection = normalize(vPosition - cameraPosition);
+    float fresnel = dot(viewDirection, normalize(vNormal)) + 1.;
+    return pow(fresnel, 3.);
 }
 
 void main() {
@@ -201,10 +202,10 @@ void main() {
 
     float fresnel = CalcFresnel();
 
-    vec3 resultColor = sunColor + (fresnel / 1.3);
+    vec3 resultColor = sunColor + fresnel;
 
     // Pass as v0 into gl_FragColor to see the fresnel effect only
-    vec3 fresnelOnlyColor = color + fresnel; 
+    // vec3 fresnelOnlyColor = color + fresnel; 
     
 
     gl_FragColor = vec4(resultColor , 1.);
