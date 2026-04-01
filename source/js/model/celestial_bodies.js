@@ -33,8 +33,15 @@ import { degToRad } from 'three/src/math/MathUtils.js';
     import earthFragmentShader from "../../shaders/earth/fragment.glsl";
     import earthVertexShader from "../../shaders/earth/vertex.glsl";
 
-    import atmosphereFragmentShader from "../../shaders/earth_atmosphere/fragment.glsl";
-    import atmosphereVertexShader from "../../shaders/earth_atmosphere/vertex.glsl";
+    import atmosphereFragmentShader from "../../shaders/earth/atmosphere/fragment.glsl";
+    import atmosphereVertexShader from "../../shaders/earth/atmosphere/vertex.glsl";
+
+    // Каменистые планеты и газовые гиганты
+    import rockyGasFragmentShader from "../../shaders/non_earth_planet/fragment.glsl";
+    import rockyGasVertexShader from "../../shaders/non_earth_planet/vertex.glsl";
+
+    import rockyAtmosphereFragmentShader from  "../../shaders/non_earth_planet/rocky_atmosphere/fragment.glsl";
+    import rockyAtmosphereVertexShader from  "../../shaders/non_earth_planet/rocky_atmosphere/vertex.glsl";
 
     // Тестовые шейдеры
     import testFragmentShader from "../../shaders/test/fragment.glsl";
@@ -227,6 +234,51 @@ class Planet extends CelestialBody {
         //     // this.material.normalMap = textureLoader.load(`./assets/textures/${obj.id}/normalMap.jpg`);
         // }
 
+        if(obj.id < 10 && obj.id != 3) {
+            this.textures = {
+                surfaceTexture: textureLoader.load(`./assets/textures/${obj.id}/texture.jpg`)
+            }
+            if(obj.id == 1) {
+                this.AtmosphereDayColor = '#c4c4c4';
+                this.AtmosphereTwilightColor = '#636363';
+            } else if(obj.id == 2) {
+                this.AtmosphereDayColor = '#fbd9a1';
+                this.AtmosphereTwilightColor = '#c49d62';
+            } else if(obj.id == 4) {
+                this.AtmosphereDayColor = '#ffb981';
+                this.AtmosphereTwilightColor = '#ff9e4f';
+            } else if(obj.id == 5) {
+                this.AtmosphereDayColor = '#c0a384';
+                this.AtmosphereTwilightColor = '#948679';
+            } else if (obj.id == 6) {
+                this.AtmosphereDayColor = '#feeacd';
+                this.AtmosphereTwilightColor = '#ff9e4f';
+            } else if (obj.id == 7) {
+                this.AtmosphereDayColor = '#afe4ea';
+                this.AtmosphereTwilightColor = '#80abb2';
+            } else if (obj.id == 8) {
+                this.AtmosphereDayColor = '#80abfa';
+                this.AtmosphereTwilightColor = '#3648a7';
+            }
+
+            this.planetUniforms = THREE.UniformsUtils.clone(uniformData);
+            this.planetUniforms.uSurfaceTexture = new THREE.Uniform(this.textures.surfaceTexture);
+            this.planetUniforms.id = obj.id;
+            console.log(this.planetUniforms)
+
+            this.planetUniforms.uAtmosphereDayColor = new THREE.Uniform(new THREE.Color(this.AtmosphereDayColor));
+            this.planetUniforms.uAtmosphereTwilightColor = new THREE.Uniform(new THREE.Color(this.AtmosphereTwilightColor));
+
+            this.material = new THREE.ShaderMaterial({
+                vertexShader: rockyGasVertexShader,
+                fragmentShader: rockyGasFragmentShader,
+                uniforms: this.planetUniforms,
+                // wireframe: true
+                // map: textureLoader.load(`./assets/textures/${obj.id}/texture.jpg`),
+            });
+        }
+
+        // EARTH
         if(obj.id == 3) {
             this.textures = {
                 dayTexture: textureLoader.load(`./assets/textures/${obj.id}/texture.jpg`),
@@ -268,24 +320,23 @@ class Planet extends CelestialBody {
             this.atmosphere.scale.set(1.04, 1.04, 1.04);
             this.atmosphere.position.set(this.distance, 0, 0);
             this.planetGroup.add(this.atmosphere);
-            console.log("EARTH", this.mesh.position, this.atmosphere.position);
             
             this.planetGroup.rotation.y = Math.PI;
+        }
 
-            // [------] OLD EARTH STYLING [------]
-            // this.material.reflectivityMap = textureLoader.load(`./assets/textures/${obj.id}/specularMap.jpg`);
-
-            // this.cloudsMaterial = new THREE.MeshStandardMaterial({
-            //     map: textureLoader.load(`./assets/textures/${obj.id}/clouds.jpg`),
-            //     blending: THREE.AdditiveBlending, // Использование метода смешивания пересекающихся текстур
-            //     transparent: 0.7
-            // });
-            
-            // this.cloudsMesh = new THREE.Mesh(this.geometry, this.cloudsMaterial);
-            // this.cloudsMesh.rotation.z = MathUtils.degToRad(obj.tilt);
-            // this.cloudsMesh.scale.setScalar(1.01);
-            // this.cloudsMesh.position.set(this.distance, 0, 0);
-            // this.planetGroup.add(this.cloudsMesh);
+        // MARS
+        if(obj.id == 4) {
+            this.atmosphereMaterial = new THREE.ShaderMaterial({
+                vertexShader: rockyAtmosphereVertexShader,
+                fragmentShader: rockyAtmosphereFragmentShader,
+                uniforms: this.planetUniforms,
+                side: THREE.BackSide,
+                transparent: true,
+            });
+            this.atmosphere = new THREE.Mesh(this.geometry, this.atmosphereMaterial);
+            this.atmosphere.scale.set(1.04, 1.04, 1.04);
+            this.atmosphere.position.set(this.distance, 0, 0);
+            this.planetGroup.add(this.atmosphere);
         }
 
         if(obj.id >= 6 && obj.id < 10) {
