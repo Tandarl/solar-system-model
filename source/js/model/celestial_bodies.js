@@ -17,9 +17,6 @@ import { degToRad } from 'three/src/math/MathUtils.js';
         uvScale: { 
             value: new THREE.Vector2(3.0, 1.0) 
         },
-        uSunDirection: {
-            value: new THREE.Vector3(-1.0, 0.0, 0.0)
-        } 
     }
 
     // [-------] Uniforms для шейдеров [-------]

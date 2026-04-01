@@ -173,11 +173,12 @@ scene.background = new THREE.CubeTextureLoader()
 
 // [-------] Инициализация часов (см. renderLoop для деталей) [-------]
 
-const clock = new THREE.Clock();
+const clock = new THREE.Timer();
+clock.connect(document);
 let PreviousTime = 0;
 let delta;
 
-uniformData.u_time.value = clock.getElapsedTime();
+uniformData.u_time.value = clock.getElapsed();
 
 // [-------] Инициализация часов [-------]
 
@@ -186,9 +187,10 @@ uniformData.u_time.value = clock.getElapsedTime();
     const renderLoop = () => {
         // !!! Удалить stats.begin()  и stats.end() на проде
         stats.begin();
+        clock.update();
 
         // Следующие операции со временем нужны для обеспечения независимости рендеринга от частоты кадров
-        const currentTime = clock.getElapsedTime();
+        const currentTime = clock.getElapsed();
         delta = currentTime - PreviousTime;
         PreviousTime = currentTime;
 
@@ -206,7 +208,7 @@ uniformData.u_time.value = clock.getElapsedTime();
         renderer.render(scene, camera);
         labelRenderer.render(scene, camera);
 
-        uniformData.u_time.value = clock.getElapsedTime();
+        uniformData.u_time.value = clock.getElapsed();
         stats.end();
         // Функция вызывает сама себя, причем при помощи метода requestAnimationFrame
         // достигается баланс между приемлемой частотой кадров и нагрузкой на систему
