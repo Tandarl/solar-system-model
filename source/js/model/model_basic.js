@@ -86,6 +86,40 @@ scene.background = new THREE.CubeTextureLoader()
             scene.add(celestialBodiesMeshesList[i].planetGroup);
         }
     }
+
+// [-------] Работа с отображением лейблов у объектов [-------]
+    const LabelManager = {
+        previousDistance: 0,
+        distance: 0,
+
+        hideLabels(from_ID, upTo_ID) {
+            for (let i = from_ID; i <= upTo_ID; i++) {
+                celestialBodiesMeshesList[i].textLabel.visible = false;
+                celestialBodiesMeshesList[i].markerLabel.visible = false;
+            }
+        },
+
+        showLabels(from_ID, upTo_ID) {
+            for (let i = from_ID; i <= upTo_ID; i++) {
+                if (celestialBodiesMeshesList[i] != focusObject) {
+                    celestialBodiesMeshesList[i].textLabel.visible = true;
+                    celestialBodiesMeshesList[i].markerLabel.visible = true;
+                }
+            }
+        },
+
+        chooseAction(d) {
+            this.distance = d;
+            // console.log(this.distance);
+            if (this.distance > 185_000) { this.hideLabels(1, 4) }
+            else if (this.distance > 1000 && this.distance < 10_000) { this.showLabels(0, 4) }
+            else if (this.distance <= 1200) { this.hideLabels(0, 8) }
+            else if (this.distance > 10_000) { this.showLabels(0, 8) }
+
+            this.previousDistance = this.distance;
+        },
+    }
+// [-------] Работа с отображением лейблов у объектов [-------]
     
     // Инициализация и настройка камеры
     const camera = new THREE.PerspectiveCamera(
@@ -115,6 +149,8 @@ scene.background = new THREE.CubeTextureLoader()
     controls.enableDamping = ENABLE_DAMPING; // Эффект "инерции" при вращении камеры. Дает большую иммерсивность
     controls.zoomSpeed = 8;
     controls.minDistance = (focusObject.radius / 10000) * 1.2;
+    
+    controls.addEventListener('change', InitiateLabelsCheck);
 
 
 // [-------] Конец базовой организации модели [-------]
@@ -169,6 +205,19 @@ scene.background = new THREE.CubeTextureLoader()
 
 // [-------] Функции обновления состояния камеры и инструментов управления [-------]
 
+
+// [-------] Работа с отображением лейблов у объектов [-------]
+// !!!! Заменить на LabelManager объект, развести логику по отдельным функциям
+
+    
+
+    function InitiateLabelsCheck() {
+        const distance = controls.getDistance();
+        LabelManager.chooseAction(distance);
+    }
+
+// [-------] Работа с отображением лейблов у объектов [-------]
+
 // Сферическая система координат (см. статью Википедии)
 
 // [-------] Инициализация часов (см. renderLoop для деталей) [-------]
@@ -203,6 +252,8 @@ uniformData.u_time.value = clock.getElapsed();
         }
 
         camera.copy(fakeCamera);
+
+        // console.log(controls.getDistance());
 
         // Вызов функции рендера с переданными в нее сценой и камерой (по сути - создание кадра)
         renderer.render(scene, camera);

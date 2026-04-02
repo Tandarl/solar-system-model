@@ -45,9 +45,6 @@ import { degToRad } from 'three/src/math/MathUtils.js';
     import testVertexShader from "../../shaders/test/vertex.glsl";
 
 
-
-// radius, tilt, albedo, normalMap, specularMap
-
 // Интенсивность солнечного света  (условные единицы)
 const SUN_LIGHT_IMITATOR_INTENSITY = 3.5e5; // 2.8e5
 // Скорость времени (количество секунд модели в секунду реального времени)
@@ -367,7 +364,7 @@ class Planet extends CelestialBody {
         this.orbitCurve = new THREE.EllipseCurve(
             0, 0, // координаты центра орбиты в ее плоскости
             this.distance, this.distance, // радиус орбиты
-            0.001, (2 * Math.PI) - 0.001, // Угол начала линии орбиты и ее конец
+            0.002, (2 * Math.PI) - 0.002, // Угол начала линии орбиты и ее конец
             false, // Направление отрисовки
             0
         );
