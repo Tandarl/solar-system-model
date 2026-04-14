@@ -9,6 +9,8 @@ import { SidePanel } from "../ui/side_panel";
 // [-------] Глобальные константы конфигурации [-------]
 
 // const SUN_LIGHT_INTENSITY = 2.8e9;
+// BASE SCALE DIVIDER = 10000
+const SCALE_DIVIDER = 10000;
 const CAMERA_MAX_DISTANCE = 900000;
 const ENABLE_DAMPING = true;
 const ENABLE_PAN = false;
@@ -125,7 +127,7 @@ scene.background = new THREE.CubeTextureLoader()
     const camera = new THREE.PerspectiveCamera(
         70,
         window.innerWidth / window.innerHeight,
-        0.1,
+        0.0001,
         4.5e6
     );
     
@@ -148,7 +150,7 @@ scene.background = new THREE.CubeTextureLoader()
     controls.enablePan = ENABLE_PAN; // Отключение возможности изменения центра вращения камеры "перетаскиванием"
     controls.enableDamping = ENABLE_DAMPING; // Эффект "инерции" при вращении камеры. Дает большую иммерсивность
     controls.zoomSpeed = 8;
-    controls.minDistance = (focusObject.radius / 10000) * 1.2;
+    controls.minDistance = (focusObject.radius / SCALE_DIVIDER) * 1.2;
     
     controls.addEventListener('change', InitiateLabelsCheck);
 
@@ -160,12 +162,13 @@ scene.background = new THREE.CubeTextureLoader()
     // Функция обновления минимальной дистанции, в зависимости
     // от радиуса объекта
     function updateControlsParams() {
-        console.log(focusObject);
+        console.log(focusObject, focusObject.radius);
         if(focusObject.id == 0) {
-            controls.minDistance = (focusObject.radius / 10000) * 1.2;
+            controls.minDistance = (focusObject.radius / SCALE_DIVIDER) * 1.2;
         } else {
-            controls.minDistance = (focusObject.radius / 10000) * 2;
+            controls.minDistance = (focusObject.radius / SCALE_DIVIDER) * 2;
         }
+        console.log("NEW MIN DIST", controls.minDistance);
     }
 
     
@@ -188,14 +191,19 @@ scene.background = new THREE.CubeTextureLoader()
         
         focusObject.auxiliaryCubeMesh.add(camera);
 
-        controls.reset();
+        // controls.reset();
         
         fakeCamera.position.x = -1;
         fakeCamera.position.y = 0;
         if(focusObject.id == 0) {
-            fakeCamera.position.z = (focusObject.radius / 10000) * 2;
-        } else {
+            fakeCamera.position.z = (focusObject.radius / SCALE_DIVIDER) * 2;
+        } else if(focusObject.id >= 1 && focusObject.id < 10) {
             fakeCamera.position.z = controls.minDistance;
+        } else {
+            fakeCamera.position.x = controls.minDistance * 1.5;
+            fakeCamera.position.y = 0;
+            fakeCamera.position.z = controls.minDistance;
+            console.log("FAKE CAM POS", fakeCamera.position);
         }
         
         camera.copy(fakeCamera);
@@ -280,4 +288,4 @@ uniformData.u_time.value = clock.getElapsed();
 
 
 
-    export {scene, camera, changeFocusedObject}
+    export {scene, camera, changeFocusedObject, SCALE_DIVIDER}

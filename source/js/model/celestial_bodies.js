@@ -6,6 +6,8 @@ import {CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 import { changeFocusedObject} from './model_basic';
 import { degToRad } from 'three/src/math/MathUtils.js';
 
+
+const SCALE_DIV = 10000;
 // Шейдеры
     // [-------] Uniforms для шейдеров [-------]
 
@@ -40,17 +42,22 @@ import { degToRad } from 'three/src/math/MathUtils.js';
     import rockyAtmosphereFragmentShader from  "../../shaders/non_earth_planet/rocky_atmosphere/fragment.glsl";
     import rockyAtmosphereVertexShader from  "../../shaders/non_earth_planet/rocky_atmosphere/vertex.glsl";
 
+    // Спутники
+    import MoonFragmentShader from "../../shaders/moon/fragment.glsl";
+    import MoonVertexShader from "../../shaders/moon/vertex.glsl";
+
     // Тестовые шейдеры
     import testFragmentShader from "../../shaders/test/fragment.glsl";
     import testVertexShader from "../../shaders/test/vertex.glsl";
 
 
 // Интенсивность солнечного света  (условные единицы)
-const SUN_LIGHT_IMITATOR_INTENSITY = 3.5e5; // 2.8e5
+const SUN_LIGHT_IMITATOR_INTENSITY = 1e4; // 2.8e5
 // Скорость времени (количество секунд модели в секунду реального времени)
-const timeSpeed = 60;
+const timeSpeed = 6000;
 
 const modelOrbitsAndIconsColors = ["#f6e324", "#c49227", "#7c28ce", "#3156ea", "#c7620e", "#ef9764", "#f1d168", "#61e2e7", "#6661e7"];
+const moonsIOColors = ["#c49227", "#c7620e", "#ef9764", "#f1d168", "#6661e7"];
 
 // Инициализация загрузчика текстур
 const textureLoader = new THREE.TextureLoader();
@@ -61,13 +68,10 @@ class CelestialBody {
         this.name = obj.name;
         this.radius = obj.radius;
         this.id = obj.id;
-        this.SpeedParams = {
-            RotationAroundAxisVelocity: (obj.body_parameters["скорость вращения вокруг своей оси"].replace(/[^\d.-]/g, '')) / (obj.radius * 1000),
-        }
 
         
         // this.geometry = new THREE.IcosahedronGeometry(obj.radius/10000, 10);
-        this.geometry = new THREE.SphereGeometry(obj.radius / 10000, 42, 42);
+        this.geometry = new THREE.SphereGeometry(obj.radius / SCALE_DIV, 52, 52);
 
         this.material = new THREE.ShaderMaterial({
             // map: textureLoader.load(`./assets/textures/${obj.id}/texture.jpg`),
@@ -76,7 +80,7 @@ class CelestialBody {
         });
         
         this.mesh = new THREE.Mesh(this.geometry, this.material);
-
+        
         this.mesh.rotation.z = MathUtils.degToRad(obj.tilt);
 
 
@@ -91,12 +95,14 @@ class CelestialBody {
             text-transform: uppercase;
             font-weight: 750;
             letter-spacing: 0.3em;
-            mix-blend-mode: difference;
+            mix-blend-mode: screen;
+            font-size: 14px;
         `;
+        // mix-blend-mode: difference;
 
         this.textLabel = new CSS2DObject(this.textLabelElem);
         this.textLabel.center.set(0, 0);
-        this.textLabel.position.set(1.5 * obj.radius / 10000, obj.radius / 10000, 0);
+        this.textLabel.position.set(1.5 * obj.radius / SCALE_DIV, obj.radius / SCALE_DIV, 0);
         this.textLabel.visible = true;
         
         // Прикрепление лейбла к объекту
@@ -145,6 +151,10 @@ class CelestialBody {
 class Star extends CelestialBody {
     constructor(obj) {
         super(obj);
+
+        this.SpeedParams = {
+            RotationAroundAxisVelocity: (obj.body_parameters["скорость вращения вокруг своей оси"].replace(/[^\d.-]/g, '')) / (obj.radius * SCALE_DIV),
+        }
 
         this.material = new THREE.ShaderMaterial({
             uniforms: uniformData,
@@ -203,7 +213,13 @@ class Planet extends CelestialBody {
     constructor(obj) {
         super(obj);
 
-        this.geometry = new THREE.SphereGeometry(obj.radius / 10000, 52, 52);
+        this.moons = [];
+
+        this.SpeedParams = {
+            RotationAroundAxisVelocity: (obj.body_parameters["скорость вращения вокруг своей оси"].replace(/[^\d.-]/g, '')) / (obj.radius * SCALE_DIV),
+        }
+
+        this.geometry = new THREE.SphereGeometry(obj.radius / SCALE_DIV, 52, 52);
         
         this.material = new THREE.ShaderMaterial({});
 
@@ -213,7 +229,7 @@ class Planet extends CelestialBody {
         console.log("orbit vel:", this.SpeedParams.OrbitalVelocity);
 
         // Определение дистанции (в рамках модели) от объекта до того небесного тела, вокруг которого он обращается
-        this.distance = obj.mediumDistanceFromParentObject / 10000;
+        this.distance = obj.mediumDistanceFromParentObject / SCALE_DIV;
 
         // создание группы мешей планеты, в которую позже будут добавлены меши самой планеты, ее орбиты и прочих вспомогательных объектов (см. код ниже для подробностей)
         this.planetGroup = new THREE.Group();
@@ -316,6 +332,12 @@ class Planet extends CelestialBody {
             this.planetGroup.add(this.atmosphere);
             
             this.planetGroup.rotation.y = Math.PI;
+
+            console.log("EARTH POSITION", this.mesh.position);
+
+            console.log("THIS IN EARTH", this);
+            this.moons.push(new Moon(celestialBodiesData[4], this));
+            this.planetGroup.add(this.moons[0].moonGroup);
         }
 
         // MARS
@@ -328,16 +350,22 @@ class Planet extends CelestialBody {
                 transparent: true,
             });
             this.atmosphere = new THREE.Mesh(this.geometry, this.atmosphereMaterial);
-            this.atmosphere.scale.set(1.04, 1.04, 1.04);
+            this.atmosphere.scale.set(1.03, 1.03, 1.03);
             this.atmosphere.position.set(this.distance, 0, 0);
             this.planetGroup.add(this.atmosphere);
+
+            this.moons.push(new Moon(celestialBodiesData[6], this));
+            this.moons.push(new Moon(celestialBodiesData[7], this));
+
+            this.planetGroup.add(this.moons[0].moonGroup);
+            this.planetGroup.add(this.moons[1].moonGroup);
         }
 
         if(obj.id >= 6 && obj.id < 10) {
             /* Получение из свойств объекта данных о расстоянии самого внутреннего
                 И самого внешнего колец планеты от ее центра */
-            this.innerRadius = obj.innerRingsDistanceFromTheCenterOfPlanet / 10000;
-            this.outerRadius = obj.outerRingsDistanceFromTheCenterOfPlanet / 10000;
+            this.innerRadius = obj.innerRingsDistanceFromTheCenterOfPlanet / SCALE_DIV;
+            this.outerRadius = obj.outerRingsDistanceFromTheCenterOfPlanet / SCALE_DIV;
 
             this.ringsGeometry = new THREE.RingGeometry(this.innerRadius, this.outerRadius, 64);
 
@@ -389,12 +417,12 @@ class Planet extends CelestialBody {
 
         
         // Источник света располагаемый на определенном расстоянии от планеты для достаточного ее освещения
-        this.sunLightImitator = new THREE.PointLight(0xffffff, SUN_LIGHT_IMITATOR_INTENSITY);
+        this.sunLightImitator = new THREE.PointLight(0xff0000, SUN_LIGHT_IMITATOR_INTENSITY);
         console.log("distance", this.distance);
-        this.sunLightImitator.position.set(this.distance - 1000, 0, 0);
+        this.sunLightImitator.position.set(this.distance - 50, 0, 0);
 
-        this.TestCubeGeometry = new THREE.BoxGeometry(100, 100, 100);
-        this.TestCubeMat = new THREE.MeshBasicMaterial({color:0xff0000});
+        this.TestCubeGeometry = new THREE.BoxGeometry(1, 1, 1);
+        this.TestCubeMat = new THREE.MeshBasicMaterial({ color: 0xffff99 });
         this.TestCubeMesh = new THREE.Mesh(this.TestCubeGeometry, this.TestCubeMat);
         this.TestCubeMesh.position.copy(this.sunLightImitator.position);
 
@@ -414,12 +442,17 @@ class Planet extends CelestialBody {
 
     UpdateRotation(delta) {
         super.UpdateRotation(delta);
-        if (this.cloudsMesh) this.cloudsMesh.rotation.y += this.SpeedParams.RotationAroundAxisVelocity * 1.1 * delta * timeSpeed;
     }
 
-    Update(delta, currentTime) {
+    Update(delta) {
         this.UpdateRotation(delta);
-        this.UpdatePosition(delta, currentTime);
+        this.UpdatePosition(delta);
+        // Calling moons update methods
+        if(Array.isArray(this.moons) && this.moons.length !== 0) {
+            for(let i = 0; i < this.moons.length; i++) {
+                this.moons[i].Update(delta);
+            }
+        }
     }
 
     ToggleFocusState(command) {
@@ -436,15 +469,180 @@ class Planet extends CelestialBody {
     }
 }
 
+class Moon extends CelestialBody {
+    constructor(obj, parent) {
+        super(obj);
+
+        this.parent = parent;
+
+        if (obj.id == 41 || obj.id == 42) {
+            this.textures = {
+                surfaceTexture: textureLoader.load(`./assets/textures/41/texture.png`)
+            }
+        } else {
+            this.textures = {
+                surfaceTexture: textureLoader.load(`./assets/textures/${obj.id}/texture.jpg`)
+            }
+        }
+
+       
+        if (obj.id in [31, 41, 42]) {
+            this.AtmosphereDayColor = '#8d8d8d';
+            this.AtmosphereTwilightColor = '#636363';
+        }
+
+        this.planetUniforms = THREE.UniformsUtils.clone(uniformData);
+        this.planetUniforms.uSurfaceTexture = new THREE.Uniform(this.textures.surfaceTexture);
+        this.planetUniforms.id = obj.id;
+        this.planetUniforms.uPlanetRadius = new THREE.Uniform(this.parent.radius / SCALE_DIV);
+        this.planetUniforms.uSquaredPlanetRadius = new THREE.Uniform((this.parent.radius / SCALE_DIV) * (this.parent.radius / SCALE_DIV));
+        // this.planetUniforms.uPlanetRadius = new THREE.Uniform((parent.radius / SCALE_DIV));
+        console.log("MOONS UNIFORMS", parent.mesh.position);
+        console.log("PLANTER RADIUS", this.planetUniforms.uPlanetRadius);
+
+        this.planetUniforms.uAtmosphereDayColor = new THREE.Uniform(new THREE.Color(this.AtmosphereDayColor));
+        this.planetUniforms.uAtmosphereTwilightColor = new THREE.Uniform(new THREE.Color(this.AtmosphereTwilightColor));
+
+        this.material = new THREE.ShaderMaterial({
+            vertexShader: MoonVertexShader,
+            fragmentShader: MoonFragmentShader,
+            uniforms: this.planetUniforms,
+            // wireframe: true
+            // map: textureLoader.load(`./assets/textures/${obj.id}/texture.jpg`),
+        });
+        this.mesh.material = this.material;
+
+        console.log("RECEIVED PARENT", parent);
+        // this.parentObject = parent;
+
+        this.SpeedParams = {
+            RotationAroundAxisVelocity: (obj.orbit_parameters["скорость вращения вокруг своей оси"].replace(/[^\d.-]/g, '')) / (obj.radius * SCALE_DIV),
+            OrbitalVelocity: (obj.orbit_parameters["орбитальная скорость"].replace(/[^\d.-]/g, '')) / (obj.mediumDistanceFromParentObject),
+        }
+
+        
+        console.log("MOON CHECK", celestialBodiesMeshesList);
+        // TEMPORARY !!!
+        // this.material = new THREE.MeshStandardMaterial({
+        //     map: textureLoader.load(`./assets/textures/31/texture.jpg`),
+        //     //  wireframe: true // Toggle to show geometry
+        // });
+        this.markerColor = moonsIOColors[this.id % 5];
+        // По умолчанию лейбл и название скрыты
+        this.textLabelElem.style.visibility = "visible";
+        this.markerLabelELem.style.visibility = "visible";
+        
+        
+        
+        this.moonGroup = new THREE.Group();
+        
+        
+        
+        this.distance = (obj.mediumDistanceFromParentObject / SCALE_DIV) + parent.distance;
+        // console.log("DISTANCE", this.distance, this.parentObject.distance);
+
+        
+        this.orbitRadius = obj.mediumDistanceFromParentObject / SCALE_DIV;
+        this.orbitCurve = new THREE.EllipseCurve(
+            0, 0, // координаты центра орбиты в ее плоскости
+            this.orbitRadius, this.orbitRadius, // радиус орбиты
+            0.05, (2 * Math.PI) - 0.05, // Угол начала линии орбиты и ее конец
+            false, // Направление отрисовки
+            0
+        );
+        this.orbitCurve.curveType = 'centripetal'
+        this.orbitPoints = this.orbitCurve.getPoints(64);
+        this.orbitGeometry = new THREE.BufferGeometry().setFromPoints(this.orbitPoints);
+        this.orbitMaterial = new THREE.LineBasicMaterial({ color: this.markerColor });
+        // Итоговый объект орбиты, который будет добавляться на сцену
+        this.orbit = new THREE.Line(this.orbitGeometry, this.orbitMaterial);
+        // Поворот орбиты на 90 градусов ((Пи/2) радиан соответственно) относительно оси x
+        this.orbit.rotation.x = Math.PI / 2;
+        // this.orbit.position.set(this.distance, 0, 0);
+        this.orbit.position.set(0, 0, 0);
+
+
+        // Вспомогательный объект, к которому будет прикреплена камера
+        this.auxiliaryCubeSize = (this.radius / SCALE_DIV) / 10;
+        this.auxiliaryCubeGeometry = new THREE.BoxGeometry(this.auxiliaryCubeSize, this.auxiliaryCubeSize, this.auxiliaryCubeSize);
+
+        this.auxiliaryCubeMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        this.auxiliaryCubeMesh = new THREE.Mesh(this.auxiliaryCubeGeometry, this.auxiliaryCubeMaterial);
+        this.mesh.position.set(this.orbitRadius, 0, 0);
+        this.auxiliaryCubeMesh.position.copy(this.mesh.position);
+
+        this.moonGroup.add(this.mesh);
+        this.moonGroup.add(this.orbit);
+        this.moonGroup.add(this.auxiliaryCubeMesh);
+        this.moonGroup.position.set(parent.distance, 0, 0);
+
+        if(this.id == 31) {
+            this.mesh.rotateY((2 * Math.PI) / 3);
+        }
+
+        // this.planetUniforms.uPlanetPosition = new THREE.Uniform(new THREE.Vector3(this.moonGroup.position.x, this.moonGroup.position.y, this.moonGroup.position.z));
+        this.planetPos = new THREE.Vector3(0, 0, 0);
+        this.moonGroup.getWorldPosition(this.planetPos);
+        this.planetUniforms.uPlanetPosition = new THREE.Uniform(this.planetPos);
+        
+        this.meshWorldPos = new THREE.Vector3(0, 0, 0);
+        this.mesh.getWorldPosition(this.meshWorldPos);
+        this.planetUniforms.uMeshWorldPos = new THREE.Uniform(this.meshWorldPos);
+        console.log("MOON GROUP POS", this.planetUniforms.uPlanetPosition, this.meshWorldPos);
+    }
+
+    UpdateRotation(delta) {
+        super.UpdateRotation(delta);
+    }
+
+    UpdatePosition(delta) {
+        this.moonGroup.rotation.y += this.SpeedParams.OrbitalVelocity * delta * timeSpeed;
+    }
+
+    Update(delta) {
+        this.UpdateRotation(delta);
+        this.UpdatePosition(delta);
+
+        // console.log(this.moonGroup.position.x);
+        // this.planetUniforms.uPlanetPosition.value.copy(new THREE.Vector3(this.moonGroup.getWorldPosition()));
+        this.moonGroup.getWorldPosition(this.planetPos);
+        this.planetUniforms.uPlanetPosition.value.copy(this.planetPos);
+
+        this.mesh.getWorldPosition(this.meshWorldPos);
+        this.planetUniforms.uMeshWorldPos.value.copy(this.meshWorldPos);
+        // if(this.id == 42) {
+            // console.log(this.planetUniforms);
+        // }
+    }
+
+    ToggleFocusState(command) {
+        // Вызов метода родительского класса CelestialBody
+        super.ToggleFocusState(command);
+        if (command) {
+            // Переход объекта от которого был совершен переход в состояние "расфокуса", затем передача текущего объекта в переменную focusObject
+            // и смена цели слежения для камеры на новосфокусированный объект
+            focusObject.ToggleFocusState(0);
+            console.log("FOCUS TOGGLE", this);
+            focusObject = this;
+            changeFocusedObject();
+        }
+    }
+}
+
 
 let celestialBodiesData = DBAPI.GetCelestialBodiesObjectList();
 let celestialBodiesMeshesList = [];
 for(let obj of celestialBodiesData) {
     if(obj.id == 0) celestialBodiesMeshesList.push(new Star(obj));
     else if(obj.id < 9) celestialBodiesMeshesList.push(new Planet(obj)); // < 9
+    // else if(obj.id >= 10) celestialBodiesMeshesList.push(new Moon(obj));
 }
 console.log(celestialBodiesMeshesList);
 console.log(celestialBodiesMeshesList.length);
+
+// const testMoon = new Moon(celestialBodiesData[4]);
+// celestialBodiesMeshesList.push(testMoon);
+console.log("DATA", celestialBodiesData);
 
 
 let focusObject = celestialBodiesMeshesList[0];
