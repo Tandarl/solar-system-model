@@ -93,11 +93,14 @@ scene.background = new THREE.CubeTextureLoader()
     const LabelManager = {
         previousDistance: 0,
         distance: 0,
+		planetSystemRadius: 0,
 
-        hideLabels(from_ID, upTo_ID) {
+        hideLabels(from_ID, upTo_ID, hideMarkers) {
             for (let i = from_ID; i <= upTo_ID; i++) {
                 celestialBodiesMeshesList[i].textLabel.visible = false;
-                celestialBodiesMeshesList[i].markerLabel.visible = false;
+				if(hideMarkers == true) {
+					celestialBodiesMeshesList[i].markerLabel.visible = false;
+				}
             }
         },
 
@@ -110,19 +113,66 @@ scene.background = new THREE.CubeTextureLoader()
             }
         },
 
+        hideMoonsLabels(from_ID, upTo_ID, listParent) {
+            for (let i = from_ID; i <= upTo_ID; i++) {
+                listParent.moons[i].textLabel.visible = false;
+                listParent.moons[i].markerLabel.visible = false;
+            }
+        },
+
+        showMoonsLabels(from_ID, upTo_ID, listParent) {
+            for (let i = from_ID; i <= upTo_ID; i++) {
+                if (listParent.moons[i] != focusObject) {
+                    listParent.moons[i].textLabel.visible = true;
+                    listParent.moons[i].markerLabel.visible = true;
+                }
+            }
+        },
+
+		choosePlanetsAction() {
+			if (this.distance > 185_000) { this.hideLabels(1, 4, false) }
+			else if (this.distance > 1000 && this.distance < 10_000) { this.showLabels(0, 4) }
+			else if (this.distance <= 1200) { this.hideLabels(0, 8, true) }
+			else if (this.distance > 10_000) { this.showLabels(0, 8) }
+
+			if(this.distance > 5 && focusObject.id > 10) {this.showLabels(focusObject.parent.id, focusObject.parent.id)}
+		},
+
+		chooseMoonsActon() {
+			if (focusObject.id >= 3) {
+				if(focusObject.id < 10) {
+					this.planetSystemRadius = focusObject.farthestMoonOrbitRadius;
+					if(this.distance > this.planetSystemRadius * 10 || this.distance < controls.minDistance * 1.2) {
+						this.hideMoonsLabels(0, focusObject.moons.length - 1, focusObject);
+					} else {
+						this.showMoonsLabels(0, focusObject.moons.length - 1, focusObject);
+					}
+				} else {
+					this.planetSystemRadius = focusObject.parent.farthestMoonOrbitRadius;
+					if(this.distance > this.planetSystemRadius * 50) {
+						this.hideMoonsLabels(0, focusObject.parent.moons.length - 1, focusObject.parent);
+					} else {
+						this.showMoonsLabels(0, focusObject.parent.moons.length - 1, focusObject.parent);
+					}
+				}
+			}
+		}, 
+
+
         chooseAction(d) {
             this.distance = d;
-            // console.log(this.distance);
-            if (this.distance > 185_000) { this.hideLabels(1, 4) }
-            else if (this.distance > 1000 && this.distance < 10_000) { this.showLabels(0, 4) }
-            else if (this.distance <= 1200) { this.hideLabels(0, 8) }
-            else if (this.distance > 10_000) { this.showLabels(0, 8) }
+            if(this.distance != this.previousDistance){
+                console.log("DISTANCE", d);
+                // Условия для планет
+                this.choosePlanetsAction();
 
+                // Условия для спутников
+				this.chooseMoonsActon();
+            }
             this.previousDistance = this.distance;
         },
     }
 // [-------] Работа с отображением лейблов у объектов [-------]
-    
     // Инициализация и настройка камеры
     const camera = new THREE.PerspectiveCamera(
         70,
@@ -215,10 +265,6 @@ scene.background = new THREE.CubeTextureLoader()
 
 
 // [-------] Работа с отображением лейблов у объектов [-------]
-// !!!! Заменить на LabelManager объект, развести логику по отдельным функциям
-
-    
-
     function InitiateLabelsCheck() {
         const distance = controls.getDistance();
         LabelManager.chooseAction(distance);

@@ -1,6 +1,6 @@
 import {collapseableStructuresList} from './collapseable_elements';
 import { SidePanel } from './side_panel';
-import { celestialBodiesMeshesList } from '../model/celestial_bodies';
+import { celestialBodiesMeshesList, focusObject } from '../model/celestial_bodies';
 
 const CelestialBodiesList = {
 

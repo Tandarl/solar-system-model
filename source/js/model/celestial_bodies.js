@@ -54,7 +54,7 @@ const SCALE_DIV = 10000;
 // Интенсивность солнечного света  (условные единицы)
 const SUN_LIGHT_IMITATOR_INTENSITY = 1e4; // 2.8e5
 // Скорость времени (количество секунд модели в секунду реального времени)
-const timeSpeed = 6000;
+const timeSpeed = 60;
 
 const modelOrbitsAndIconsColors = ["#f6e324", "#c49227", "#7c28ce", "#3156ea", "#c7620e", "#ef9764", "#f1d168", "#61e2e7", "#6661e7"];
 const moonsIOColors = ["#c49227", "#c7620e", "#ef9764", "#f1d168", "#6661e7"];
@@ -384,6 +384,11 @@ class Planet extends CelestialBody {
             this.planetGroup.add(this.ringsMesh);
         }
 
+        // Радиус самой дальней орбиты спутника (если есть)
+        if (this.moons?.length) {
+            this.farthestMoonOrbitRadius = this.moons[this.moons.length - 1].distToParent;
+        }
+
         // Применение соответствующих материалов к мешам
         this.mesh.material = this.material;
         
@@ -464,6 +469,14 @@ class Planet extends CelestialBody {
             focusObject.ToggleFocusState(0);
             console.log(this);
             focusObject = this;
+            if (focusObject.id >= 3 && focusObject.moons?.length) {
+                for(let i =0; i < focusObject.moons.length; i++) {
+                    // this.textLabelElem.style.visibility = "hidden";
+                    // this.markerLabelELem.style.visibility = "hidden";
+                    focusObject.moons[i].textLabelElem.style.visibility = "visible";
+                    focusObject.moons[i].markerLabelELem.style.visibility = "visible";
+                }
+            }
             changeFocusedObject();
         }
     }
@@ -529,8 +542,8 @@ class Moon extends CelestialBody {
         // });
         this.markerColor = moonsIOColors[this.id % 5];
         // По умолчанию лейбл и название скрыты
-        this.textLabelElem.style.visibility = "visible";
-        this.markerLabelELem.style.visibility = "visible";
+        this.textLabelElem.style.visibility = "hidden";
+        this.markerLabelELem.style.visibility = "hidden";
         
         
         
@@ -539,6 +552,7 @@ class Moon extends CelestialBody {
         
         
         this.distance = (obj.mediumDistanceFromParentObject / SCALE_DIV) + parent.distance;
+        this.distToParent = (obj.mediumDistanceFromParentObject / SCALE_DIV);
         // console.log("DISTANCE", this.distance, this.parentObject.distance);
 
         
