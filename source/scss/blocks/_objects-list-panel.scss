@@ -31,6 +31,12 @@
     column-gap: 5px;
 }
 
+.objects-list-panel__object, .objects-list-panel__object-satellites-list, .objects-list-panel__expandable-group-header, .objects-list-panel__object--expandable {
+    :hover {
+        cursor: pointer;
+    }
+}
+
 .objects-list-panel__object-name {
     color: $object-header;
     font-size: 32px;
