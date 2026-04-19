@@ -50,18 +50,21 @@ const CelestialBodiesList = {
                     // с функцией открытия списка спутников.
                     if (e.target.tagName != 'path' && e.target.tagName != 'svg') {
                         // Временное условие для ограничения функционала элементов списка, отвечающих за спутники
+                        let targetID = (e.target.closest("[id]")).getAttribute('id');
+                        // Закрытие списка планет
+                        collapseableStructuresList[0].ChangeCollapseableElementsState();
                         if ((e.target.closest("[id]")).getAttribute('id') < 10) {
 
-                            let targetID = (e.target.closest("[id]")).getAttribute('id');
-                            // Закрытие списка планет
-                            collapseableStructuresList[0].ChangeCollapseableElementsState();
                             // Передача id небесного тела по пункту списка которого нажал пользователь на информационную панель
-                            SidePanel.ChangeContent(targetID);
+                            // SidePanel.ChangeContent(targetID);
                             
                             // Передача id н.т. в модель
                             celestialBodiesMeshesList[targetID].ToggleFocusState(1);
                             // SidePanel.ChangeContent((e.target.closest("[id]")).getAttribute('id'));
 
+                        } else {
+                            // Переключение фокуса на спутник
+                            celestialBodiesMeshesList[Number((targetID.charAt(0)))].moons[(Number((targetID.charAt(1))) -1)].ToggleFocusState(1);
                         }
                     }
                 });

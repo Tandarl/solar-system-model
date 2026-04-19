@@ -144,6 +144,12 @@ class CelestialBody {
         } else {
             this.textLabelElem.style.visibility = "visible";
             this.markerLabelELem.style.visibility = "visible";
+            if (focusObject.id >= 3 && focusObject.moons?.length) {
+                for (let i = 0; i < focusObject.moons.length; i++) {
+                    focusObject.moons[i].textLabelElem.style.visibility = "hidden";
+                    focusObject.moons[i].markerLabelELem.style.visibility = "hidden";
+                }
+            }
         }
     }
 }
@@ -638,6 +644,18 @@ class Moon extends CelestialBody {
             focusObject.ToggleFocusState(0);
             console.log("FOCUS TOGGLE", this);
             focusObject = this;
+            for(let i = 0; i < focusObject.parent.moons.length; i++) {
+                if(focusObject.parent.moons[i].id != focusObject.id) {
+                    focusObject.parent.moons[i].textLabelElem.style.visibility = "visible";
+                    focusObject.parent.moons[i].markerLabelELem.style.visibility = "visible";
+                }
+            }
+            changeFocusedObject();
+        } else {
+            for (let i = 0; i < focusObject.parent.moons.length; i++) {
+                    focusObject.parent.moons[i].textLabelElem.style.visibility = "hidden";
+                    focusObject.parent.moons[i].markerLabelELem.style.visibility = "hidden";
+            }
             changeFocusedObject();
         }
     }

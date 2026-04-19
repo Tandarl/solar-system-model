@@ -162,7 +162,7 @@ scene.background = new THREE.CubeTextureLoader()
         chooseAction(d) {
             this.distance = d;
             if(this.distance != this.previousDistance){
-                console.log("DISTANCE", d);
+                // console.log("DISTANCE", d);
                 // Условия для планет
                 this.choosePlanetsAction();
 
