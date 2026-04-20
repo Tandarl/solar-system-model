@@ -70,8 +70,8 @@ class CelestialBody {
         this.id = obj.id;
 
         
-        // this.geometry = new THREE.IcosahedronGeometry(obj.radius/10000, 10);
-        this.geometry = new THREE.SphereGeometry(obj.radius / SCALE_DIV, 52, 52);
+        this.geometry = new THREE.IcosahedronGeometry(obj.radius/SCALE_DIV, 10);
+        // this.geometry = new THREE.SphereGeometry(obj.radius / SCALE_DIV, 52, 52);
 
         this.material = new THREE.ShaderMaterial({
             // map: textureLoader.load(`./assets/textures/${obj.id}/texture.jpg`),
@@ -81,7 +81,7 @@ class CelestialBody {
         
         this.mesh = new THREE.Mesh(this.geometry, this.material);
         
-        this.mesh.rotation.z = MathUtils.degToRad(obj.tilt);
+        this.mesh.rotation.z = obj.tilt * (Math.PI / 180);
 
 
         // Текстовый лейбл с именем, прикрепляемый к объекту
@@ -159,7 +159,7 @@ class Star extends CelestialBody {
         super(obj);
 
         this.SpeedParams = {
-            RotationAroundAxisVelocity: (obj.body_parameters["скорость вращения вокруг своей оси"].replace(/[^\d.-]/g, '')) / (obj.radius * SCALE_DIV),
+            RotationAroundAxisVelocity: ((obj.body_parameters["скорость вращения вокруг своей оси"].replace(/[^\d.-]/g, ''))) / (obj.radius * SCALE_DIV),
         }
 
         this.material = new THREE.ShaderMaterial({
@@ -222,7 +222,7 @@ class Planet extends CelestialBody {
         this.moons = [];
 
         this.SpeedParams = {
-            RotationAroundAxisVelocity: (obj.body_parameters["скорость вращения вокруг своей оси"].replace(/[^\d.-]/g, '')) / (obj.radius * SCALE_DIV),
+            RotationAroundAxisVelocity: ((obj.body_parameters["скорость вращения вокруг своей оси"].replace(/[^\d.-]/g, '')) * SCALE_DIV) / (obj.radius * 1000 * SCALE_DIV),
         }
 
         this.geometry = new THREE.SphereGeometry(obj.radius / SCALE_DIV, 52, 52);
@@ -385,7 +385,7 @@ class Planet extends CelestialBody {
 
             this.ringsMesh = new THREE.Mesh(this.ringsGeometry, this.ringsMaterial);
             this.ringsMesh.position.set(this.distance, 0, 0);
-            this.ringsMesh.rotation.x = (Math.PI / 2) + MathUtils.degToRad(obj.tilt); 
+            this.ringsMesh.rotation.x = (Math.PI / 2) + (obj.tilt * (Math.PI / 180)); 
             
             this.planetGroup.add(this.ringsMesh);
         }
@@ -535,7 +535,7 @@ class Moon extends CelestialBody {
         // this.parentObject = parent;
 
         this.SpeedParams = {
-            RotationAroundAxisVelocity: (obj.orbit_parameters["скорость вращения вокруг своей оси"].replace(/[^\d.-]/g, '')) / (obj.radius * SCALE_DIV),
+            RotationAroundAxisVelocity: ((obj.orbit_parameters["скорость вращения вокруг своей оси"].replace(/[^\d.-]/g, '')) * SCALE_DIV) / (obj.radius * 1000 * SCALE_DIV),
             OrbitalVelocity: (obj.orbit_parameters["орбитальная скорость"].replace(/[^\d.-]/g, '')) / (obj.mediumDistanceFromParentObject),
         }
 
