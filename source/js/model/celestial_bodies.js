@@ -24,27 +24,26 @@ const SCALE_DIV = 10000;
     // [-------] Uniforms для шейдеров [-------]
     // import { uniformData } from './model_basic.js';
 
+    // Общий vertex shader для мешей небесных тел
+    import generalBodyVertexShader from "../../shaders/general_vertex/celestial_body_vertex.glsl";
+
+    // Общий vertex shader для мешей атмосферы
+    import generalAtmosphereVertexShader from "../../shaders/general_vertex/atmosphere_vertex.glsl";
+
+// {---} Фрагментарные шейдеры (свои) для каждого типа объектов {---}
     // Солнце
     import sunFragmentShader from "../../shaders/sun/fragment.glsl";
-    import sunVertexShader from "../../shaders/sun/vertex.glsl";
 
     // Земля
     import earthFragmentShader from "../../shaders/earth/fragment.glsl";
-    import earthVertexShader from "../../shaders/earth/vertex.glsl";
-
     import atmosphereFragmentShader from "../../shaders/earth/atmosphere/fragment.glsl";
-    import atmosphereVertexShader from "../../shaders/earth/atmosphere/vertex.glsl";
 
     // Каменистые планеты и газовые гиганты
     import rockyGasFragmentShader from "../../shaders/non_earth_planet/fragment.glsl";
-    import rockyGasVertexShader from "../../shaders/non_earth_planet/vertex.glsl";
-
     import rockyAtmosphereFragmentShader from  "../../shaders/non_earth_planet/rocky_atmosphere/fragment.glsl";
-    import rockyAtmosphereVertexShader from  "../../shaders/non_earth_planet/rocky_atmosphere/vertex.glsl";
 
     // Спутники
     import MoonFragmentShader from "../../shaders/moon/fragment.glsl";
-    import MoonVertexShader from "../../shaders/moon/vertex.glsl";
 
     // Тестовые шейдеры
     import testFragmentShader from "../../shaders/test/fragment.glsl";
@@ -76,7 +75,6 @@ class CelestialBody {
         // this.geometry = new THREE.SphereGeometry(obj.radius / SCALE_DIV, 42, 42);
 
         this.material = new THREE.ShaderMaterial({
-            // map: textureLoader.load(`./assets/textures/${obj.id}/texture.jpg`),
             // flatShading: true, Toggle to show polygons
             //  wireframe: true // Toggle to show geometry
         });
@@ -161,9 +159,9 @@ class Star extends CelestialBody {
         }
 
         this.material = new THREE.ShaderMaterial({
-            uniforms: uniformData,
-            vertexShader:  sunVertexShader,
+            vertexShader:  generalBodyVertexShader,
             fragmentShader: sunFragmentShader,
+            uniforms: uniformData,
             // wireframe: true,
             // map: textureLoader.load(`./assets/textures/${obj.id}/texture.jpg`),
         });
@@ -291,7 +289,7 @@ class Planet extends CelestialBody {
             this.planetUniforms.uAtmosphereTwilightColor = new THREE.Uniform(new THREE.Color(this.AtmosphereTwilightColor));
 
             this.material = new THREE.ShaderMaterial({
-                vertexShader: rockyGasVertexShader,
+                vertexShader: generalBodyVertexShader,
                 fragmentShader: rockyGasFragmentShader,
                 uniforms: this.planetUniforms,
                 // wireframe: true
@@ -323,7 +321,7 @@ class Planet extends CelestialBody {
             uniformData.uEarthAtmosphereTwilightColor = new THREE.Uniform(new THREE.Color(this.AtmosphereTwilightColor)),
 
             this.material = new THREE.ShaderMaterial({
-                vertexShader: earthVertexShader,
+                vertexShader: generalBodyVertexShader,
                 fragmentShader: earthFragmentShader,
                 uniforms: uniformData,
                 // wireframe: true
@@ -331,7 +329,7 @@ class Planet extends CelestialBody {
             });
 
             this.atmosphereMaterial = new THREE.ShaderMaterial({
-                vertexShader: atmosphereVertexShader,
+                vertexShader: generalAtmosphereVertexShader,
                 fragmentShader: atmosphereFragmentShader,
                 uniforms: uniformData,
                 side: THREE.BackSide,
@@ -355,7 +353,7 @@ class Planet extends CelestialBody {
         // MARS
         if(obj.id == 4) {
             this.atmosphereMaterial = new THREE.ShaderMaterial({
-                vertexShader: rockyAtmosphereVertexShader,
+                vertexShader: generalAtmosphereVertexShader,
                 fragmentShader: rockyAtmosphereFragmentShader,
                 uniforms: this.planetUniforms,
                 side: THREE.BackSide,
@@ -528,7 +526,7 @@ class Moon extends CelestialBody {
         this.planetUniforms.uAtmosphereTwilightColor = new THREE.Uniform(new THREE.Color(this.AtmosphereTwilightColor));
 
         this.material = new THREE.ShaderMaterial({
-            vertexShader: MoonVertexShader,
+            vertexShader: generalBodyVertexShader,
             fragmentShader: MoonFragmentShader,
             uniforms: this.planetUniforms,
             // wireframe: true
