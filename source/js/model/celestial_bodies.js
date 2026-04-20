@@ -447,7 +447,9 @@ class Planet extends CelestialBody {
     }
 
     UpdatePosition(delta) {
-        this.groups.GeneralGroup.rotation.y += this.SpeedParams.OrbitalVelocity * delta * timeSpeed;
+        let movement = this.SpeedParams.OrbitalVelocity * delta * timeSpeed;
+        this.groups.subsidiaryGroup.rotation.y += movement;
+        this.groups.meshMoonsGroup.rotation.y += movement;
     }
 
     UpdateRotation(delta) {
