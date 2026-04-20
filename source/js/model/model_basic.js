@@ -85,7 +85,7 @@ scene.background = new THREE.CubeTextureLoader()
         console.log(celestialBodiesMeshesList[0]);
         scene.add(celestialBodiesMeshesList[0].mesh);
         for (let i = 1; i < celestialBodiesMeshesList.length; i++) {
-            scene.add(celestialBodiesMeshesList[i].planetGroup);
+            scene.add(celestialBodiesMeshesList[i].groups.GeneralGroup);
         }
     }
 

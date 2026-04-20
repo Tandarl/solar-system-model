@@ -70,8 +70,8 @@ class CelestialBody {
         this.id = obj.id;
 
         
-        this.geometry = new THREE.IcosahedronGeometry(obj.radius/SCALE_DIV, 10);
-        // this.geometry = new THREE.SphereGeometry(obj.radius / SCALE_DIV, 52, 52);
+        // this.geometry = new THREE.IcosahedronGeometry(obj.radius/SCALE_DIV, 12);
+        this.geometry = new THREE.SphereGeometry(obj.radius / SCALE_DIV, 32, 32);
 
         this.material = new THREE.ShaderMaterial({
             // map: textureLoader.load(`./assets/textures/${obj.id}/texture.jpg`),
@@ -104,9 +104,6 @@ class CelestialBody {
         this.textLabel.center.set(0, 0);
         this.textLabel.position.set(1.5 * obj.radius / SCALE_DIV, obj.radius / SCALE_DIV, 0);
         this.textLabel.visible = true;
-        
-        // Прикрепление лейбла к объекту
-        this.mesh.add(this.textLabel);
 
         this.textLabelElem.addEventListener('click', this.ToggleFocusState.bind(this, 2));
 
@@ -126,9 +123,6 @@ class CelestialBody {
         this.textLabel.position.set(0, 0, 0);
         this.textLabel.center.set(0, 0);
         this.textLabel.visible = true;
-
-        // Прикрепление маркера к объекту
-        this.mesh.add(this.markerLabel)
     }
 
     UpdateRotation(delta) {
@@ -175,9 +169,6 @@ class Star extends CelestialBody {
         this.mesh = new THREE.Mesh(this.geometry, this.material);
         this.mesh.rotation.z = MathUtils.degToRad(obj.tilt);
 
-        this.mesh.add(this.textLabel);
-        this.mesh.add(this.markerLabel);
-
         this.mesh.position.set(0, 0, 0);
         // Так как Солнце изначально находится в фокусе, его маркер и лейбл скрыты по умолчанию
         this.textLabelElem.style.visibility = "hidden";
@@ -188,12 +179,17 @@ class Star extends CelestialBody {
         this.auxiliaryCubeMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
         this.auxiliaryCubeMesh = new THREE.Mesh(this.auxiliaryCubeGeometry, this.auxiliaryCubeMaterial);
         this.auxiliaryCubeMesh.position.set(0, 0, 0);
-        
-        this.starGroup = new THREE.Group();
-        this.starGroup.position.set(0, 0, 0);
 
-        this.starGroup.add(this.mesh);
-        this.starGroup.add(this.auxiliaryCubeMesh);
+        // Прикрепление маркера к объекту
+        this.mesh.add(this.markerLabel);
+        // Прикрепление лейбла к объекту
+        this.mesh.add(this.textLabel);
+        
+        // this.starGroup = new THREE.Group();
+        // this.starGroup.position.set(0, 0, 0);
+
+        // this.starGroup.add(this.mesh);
+        // this.starGroup.add(this.auxiliaryCubeMesh);
     }
 
     Update(delta) {
@@ -225,7 +221,8 @@ class Planet extends CelestialBody {
             RotationAroundAxisVelocity: ((obj.body_parameters["скорость вращения вокруг своей оси"].replace(/[^\d.-]/g, '')) * SCALE_DIV) / (obj.radius * 1000 * SCALE_DIV),
         }
 
-        this.geometry = new THREE.SphereGeometry(obj.radius / SCALE_DIV, 52, 52);
+        this.geometry = new THREE.SphereGeometry(obj.radius / SCALE_DIV, 32, 32);
+        // this.geometry = new THREE.IcosahedronGeometry(obj.radius / SCALE_DIV, 12);
         
         this.material = new THREE.ShaderMaterial({});
 
@@ -237,18 +234,16 @@ class Planet extends CelestialBody {
         // Определение дистанции (в рамках модели) от объекта до того небесного тела, вокруг которого он обращается
         this.distance = obj.mediumDistanceFromParentObject / SCALE_DIV;
 
-        // создание группы мешей планеты, в которую позже будут добавлены меши самой планеты, ее орбиты и прочих вспомогательных объектов (см. код ниже для подробностей)
-        this.planetGroup = new THREE.Group();
+        this.groups = {
+            GeneralGroup: new THREE.Group(),
+            subsidiaryGroup: new THREE.Group(),
+            meshMoonsGroup: new THREE.Group()
+        }
+        // subsidiaryGroup это отдельная группа для орбиты и вспомогательного объекта, т.к орбита отображается всегда, и к вспомогательному объекту прикреплены лейбл и метка
 
-        
-        
-        // Карта нормалей нужна для обеспечения более точного взаимодействия света с объектом без изменения
-        // геометрии самого объекта, например, создание эффекта глубины / высоты рельефа, более правильное отбрасывание теней рельефом поверхности.
-        // if(obj.id <= 4) {
-        //     // Поскольку планеты, идущие после марса являются газовыми гигантами и, соответственно, не имеют рельефа, а значит карта нормалей для них не нужна
-        //     // [------] OLD STYLING [------]
-        //     // this.material.normalMap = textureLoader.load(`./assets/textures/${obj.id}/normalMap.jpg`);
-        // }
+        // создание группы мешей планеты, в которую позже будут добавлены меши самой планеты, ее орбиты и прочих вспомогательных объектов (см. код ниже для подробностей)
+        // this.planetGroup = new THREE.Group();
+
 
         if(obj.id < 10 && obj.id != 3) {
             this.textures = {
@@ -335,15 +330,15 @@ class Planet extends CelestialBody {
             this.atmosphere = new THREE.Mesh(this.geometry, this.atmosphereMaterial);
             this.atmosphere.scale.set(1.04, 1.04, 1.04);
             this.atmosphere.position.set(this.distance, 0, 0);
-            this.planetGroup.add(this.atmosphere);
+            this.groups.meshMoonsGroup.add(this.atmosphere);
             
-            this.planetGroup.rotation.y = Math.PI;
+            this.groups.GeneralGroup.rotation.y = Math.PI;
 
             console.log("EARTH POSITION", this.mesh.position);
 
             console.log("THIS IN EARTH", this);
             this.moons.push(new Moon(celestialBodiesData[4], this));
-            this.planetGroup.add(this.moons[0].moonGroup);
+            this.groups.meshMoonsGroup.add(this.moons[0].moonGroup);
         }
 
         // MARS
@@ -358,13 +353,13 @@ class Planet extends CelestialBody {
             this.atmosphere = new THREE.Mesh(this.geometry, this.atmosphereMaterial);
             this.atmosphere.scale.set(1.03, 1.03, 1.03);
             this.atmosphere.position.set(this.distance, 0, 0);
-            this.planetGroup.add(this.atmosphere);
+            this.groups.meshMoonsGroup.add(this.atmosphere);
 
             this.moons.push(new Moon(celestialBodiesData[6], this));
             this.moons.push(new Moon(celestialBodiesData[7], this));
 
-            this.planetGroup.add(this.moons[0].moonGroup);
-            this.planetGroup.add(this.moons[1].moonGroup);
+            this.groups.meshMoonsGroup.add(this.moons[0].moonGroup);
+            this.groups.meshMoonsGroup.add(this.moons[1].moonGroup);
         }
 
         if(obj.id >= 6 && obj.id < 10) {
@@ -387,7 +382,7 @@ class Planet extends CelestialBody {
             this.ringsMesh.position.set(this.distance, 0, 0);
             this.ringsMesh.rotation.x = (Math.PI / 2) + (obj.tilt * (Math.PI / 180)); 
             
-            this.planetGroup.add(this.ringsMesh);
+            this.groups.meshMoonsGroup.add(this.ringsMesh);
         }
 
         // Радиус самой дальней орбиты спутника (если есть)
@@ -426,29 +421,24 @@ class Planet extends CelestialBody {
         this.auxiliaryCubeMesh = new THREE.Mesh(this.auxiliaryCubeGeometry, this.auxiliaryCubeMaterial);
         this.auxiliaryCubeMesh.position.set(this.distance, 0, 0);
 
-        
-        // Источник света располагаемый на определенном расстоянии от планеты для достаточного ее освещения
-        this.sunLightImitator = new THREE.PointLight(0xff0000, SUN_LIGHT_IMITATOR_INTENSITY);
-        console.log("distance", this.distance);
-        this.sunLightImitator.position.set(this.distance - 50, 0, 0);
-
-        this.TestCubeGeometry = new THREE.BoxGeometry(1, 1, 1);
-        this.TestCubeMat = new THREE.MeshBasicMaterial({ color: 0xffff99 });
-        this.TestCubeMesh = new THREE.Mesh(this.TestCubeGeometry, this.TestCubeMat);
-        this.TestCubeMesh.position.copy(this.sunLightImitator.position);
+        // Прикрепление маркера к объекту
+        this.auxiliaryCubeMesh.add(this.markerLabel);
+        // Прикрепление лейбла к объекту
+        this.auxiliaryCubeMesh.add(this.textLabel);
 
 
         // Центр группы расположен в точке начала координат, что упрощает реализацию вращения планеты вокруг Солнца
-        this.planetGroup.position.set(0, 0, 0);
-        this.planetGroup.add(this.mesh);
-        this.planetGroup.add(this.orbit);
-        this.planetGroup.add(this.auxiliaryCubeMesh);
-        this.planetGroup.add(this.sunLightImitator);
-        this.planetGroup.add(this.TestCubeMesh);
+        this.groups.GeneralGroup.position.set(0, 0, 0);
+        this.groups.meshMoonsGroup.add(this.mesh);
+        this.groups.subsidiaryGroup.add(this.orbit);
+        this.groups.subsidiaryGroup.add(this.auxiliaryCubeMesh);
+
+        this.groups.GeneralGroup.add(this.groups.meshMoonsGroup);
+        this.groups.GeneralGroup.add(this.groups.subsidiaryGroup);
     }
 
     UpdatePosition(delta) {
-        this.planetGroup.rotation.y += this.SpeedParams.OrbitalVelocity * delta * timeSpeed;
+        this.groups.GeneralGroup.rotation.y += this.SpeedParams.OrbitalVelocity * delta * timeSpeed;
     }
 
     UpdateRotation(delta) {
@@ -590,6 +580,11 @@ class Moon extends CelestialBody {
         this.auxiliaryCubeMesh = new THREE.Mesh(this.auxiliaryCubeGeometry, this.auxiliaryCubeMaterial);
         this.mesh.position.set(this.orbitRadius, 0, 0);
         this.auxiliaryCubeMesh.position.copy(this.mesh.position);
+
+        // Прикрепление маркера к объекту
+        this.auxiliaryCubeMesh.add(this.markerLabel);
+        // Прикрепление лейбла к объекту
+        this.auxiliaryCubeMesh.add(this.textLabel);
 
         this.moonGroup.add(this.mesh);
         this.moonGroup.add(this.orbit);
