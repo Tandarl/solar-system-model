@@ -17,6 +17,14 @@ const ENABLE_PAN = false;
 
 // [-------] Глобальные константы конфигурации [-------]
 
+// [-------] Начало базовой организации модели [-------]
+
+// Поиск на странице canvas элемента, в который будет направлен поток вывода изображения рендерера
+const canvas = document.querySelector('canvas.three-js');
+
+// Инициализация и настройка сцены
+const scene = new THREE.Scene();
+
 // [-------] Инструменты для разработки [-------]
 
 // Отслеживание производительности
@@ -33,15 +41,6 @@ document.body.appendChild(stats.dom);
 
 // [-------] Инструменты для разработки [-------]
 
-
-// [-------] Начало базовой организации модели [-------]
-
-// Поиск на странице canvas элемента, в который будет направлен поток вывода изображения рендерера
-const canvas = document.querySelector('canvas.three-js');
-
-// Инициализация и настройка сцены
-const scene = new THREE.Scene();
-
 // Установка снимка млечного пути задним фоном
 scene.background = new THREE.CubeTextureLoader()
     .setPath("./assets/textures/milky_way/")
@@ -49,7 +48,7 @@ scene.background = new THREE.CubeTextureLoader()
         'px.png',
         'nx.png',
         'py.png',
-        'nx.png',
+        'ny.png',
         'pz.png',
         'nz.png'
     ]);
@@ -83,9 +82,9 @@ scene.background = new THREE.CubeTextureLoader()
     // Добавление объектов на сцену
     function init() {
         console.log(celestialBodiesMeshesList[0]);
-        scene.add(celestialBodiesMeshesList[0].mesh);
+        scene.add(celestialBodiesMeshesList[0].starGroup);
         for (let i = 1; i < celestialBodiesMeshesList.length; i++) {
-            scene.add(celestialBodiesMeshesList[i].groups.GeneralGroup);
+            scene.add(celestialBodiesMeshesList[i].groups.subsidiaryGroup);
         }
     }
 
@@ -235,9 +234,24 @@ scene.background = new THREE.CubeTextureLoader()
 
     });
 
+    function unloadPlanetGroup(id) {
+        if(id != 0) {
+            console.log("UNLOAD FUNC");
+            console.log(id);
+            console.log(celestialBodiesMeshesList[id].groups.meshMoonsGroup);
+            scene.remove(celestialBodiesMeshesList[id].groups.meshMoonsGroup);
+        }
+    };
+
     function changeFocusedObject() {
         SidePanel.ChangeContent(focusObject.id);
         updateControlsParams();
+
+        if(focusObject.id < 10 && focusObject.id != 0) {
+            scene.add(celestialBodiesMeshesList[focusObject.id].groups.meshMoonsGroup);
+        } else if(focusObject.id > 10) {
+            scene.add(celestialBodiesMeshesList[Number(focusObject.id.toString()[0])].groups.meshMoonsGroup);
+        }
         
         focusObject.auxiliaryCubeMesh.add(camera);
 
@@ -334,4 +348,4 @@ uniformData.u_time.value = clock.getElapsed();
 
 
 
-    export {scene, camera, changeFocusedObject, SCALE_DIVIDER}
+    export {scene, camera, changeFocusedObject, unloadPlanetGroup, SCALE_DIVIDER}

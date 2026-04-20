@@ -3,7 +3,7 @@ import {DBAPI} from '../database/data_base_api';
 import { MathUtils } from 'three';
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
 import {CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
-import { changeFocusedObject} from './model_basic';
+import { changeFocusedObject, unloadPlanetGroup} from './model_basic';
 import { degToRad } from 'three/src/math/MathUtils.js';
 
 
@@ -56,6 +56,10 @@ const SUN_LIGHT_IMITATOR_INTENSITY = 1e4; // 2.8e5
 // Скорость времени (количество секунд модели в секунду реального времени)
 const timeSpeed = 60;
 
+const previousFocus = {
+    id: 0
+}
+
 const modelOrbitsAndIconsColors = ["#f6e324", "#c49227", "#7c28ce", "#3156ea", "#c7620e", "#ef9764", "#f1d168", "#61e2e7", "#6661e7"];
 const moonsIOColors = ["#c49227", "#c7620e", "#ef9764", "#f1d168", "#6661e7"];
 
@@ -70,8 +74,8 @@ class CelestialBody {
         this.id = obj.id;
 
         
-        // this.geometry = new THREE.IcosahedronGeometry(obj.radius/SCALE_DIV, 12);
-        this.geometry = new THREE.SphereGeometry(obj.radius / SCALE_DIV, 32, 32);
+        this.geometry = new THREE.IcosahedronGeometry(obj.radius/SCALE_DIV, 12);
+        // this.geometry = new THREE.SphereGeometry(obj.radius / SCALE_DIV, 42, 42);
 
         this.material = new THREE.ShaderMaterial({
             // map: textureLoader.load(`./assets/textures/${obj.id}/texture.jpg`),
@@ -136,6 +140,16 @@ class CelestialBody {
             this.textLabelElem.style.visibility = "hidden";
             this.markerLabelELem.style.visibility = "hidden";
         } else {
+            previousFocus.id = this.id;
+            console.log("PREVIOUS ID", previousFocus.id);
+            // if(this.id < 10 && this.id != 0) {
+            //     console.log("CALL ID", this.id);
+            //     unloadPlanetGroup(this.id);
+            // } else if(this.id > 10) {
+            //     console.log("CALL ID", this.id);
+            //     unloadPlanetGroup(Number(this.id.toString()[0]));
+            // }
+
             this.textLabelElem.style.visibility = "visible";
             this.markerLabelELem.style.visibility = "visible";
             if (focusObject.id >= 3 && focusObject.moons?.length) {
@@ -185,11 +199,11 @@ class Star extends CelestialBody {
         // Прикрепление лейбла к объекту
         this.mesh.add(this.textLabel);
         
-        // this.starGroup = new THREE.Group();
-        // this.starGroup.position.set(0, 0, 0);
+        this.starGroup = new THREE.Group();
+        this.starGroup.position.set(0, 0, 0);
 
-        // this.starGroup.add(this.mesh);
-        // this.starGroup.add(this.auxiliaryCubeMesh);
+        this.starGroup.add(this.mesh);
+        this.starGroup.add(this.auxiliaryCubeMesh);
     }
 
     Update(delta) {
@@ -197,11 +211,19 @@ class Star extends CelestialBody {
         // console.log(uniformData.uSunDirection);
     }
 
+    UnloadCheck() {
+        if (this.id.toString()[0] != previousFocus.id.toString()[0]) {
+            // console.log("THIS AND PREV IDS are equal", (this.id.toString()[0] == previousFocus.id.toString()[0]));
+            unloadPlanetGroup(Number(previousFocus.id.toString()[0]));
+        }
+    }
+
     ToggleFocusState(command) {
         super.ToggleFocusState(command);
         if(command) {
             focusObject.ToggleFocusState(0);
             focusObject = this;
+            this.UnloadCheck();
             changeFocusedObject();
         }
     }
@@ -332,7 +354,8 @@ class Planet extends CelestialBody {
             this.atmosphere.position.set(this.distance, 0, 0);
             this.groups.meshMoonsGroup.add(this.atmosphere);
             
-            this.groups.GeneralGroup.rotation.y = Math.PI;
+            this.groups.subsidiaryGroup.rotation.y = Math.PI;
+            this.groups.meshMoonsGroup.rotation.y = Math.PI;
 
             console.log("EARTH POSITION", this.mesh.position);
 
@@ -456,6 +479,14 @@ class Planet extends CelestialBody {
         }
     }
 
+    UnloadCheck() {
+        if(this.id.toString()[0] != previousFocus.id.toString()[0]) {
+            // console.log("THIS AND PREV IDS are equal", (this.id.toString()[0] == previousFocus.id.toString()[0]));
+            // console.log(previousFocus.id.toString()[0]);
+            unloadPlanetGroup(Number(previousFocus.id.toString()[0]));
+        }
+    }
+
     ToggleFocusState(command) {
         // Вызов метода родительского класса CelestialBody
         super.ToggleFocusState(command);
@@ -463,7 +494,7 @@ class Planet extends CelestialBody {
             // Переход объекта от которого был совершен переход в состояние "расфокуса", затем передача текущего объекта в переменную focusObject
             // и смена цели слежения для камеры на новосфокусированный объект
             focusObject.ToggleFocusState(0);
-            console.log(this);
+            console.log("THIS IS NEW FOCUS", this);
             focusObject = this;
             if (focusObject.id >= 3 && focusObject.moons?.length) {
                 for(let i =0; i < focusObject.moons.length; i++) {
@@ -473,6 +504,7 @@ class Planet extends CelestialBody {
                     focusObject.moons[i].markerLabelELem.style.visibility = "visible";
                 }
             }
+            this.UnloadCheck();
             changeFocusedObject();
         }
     }
@@ -630,6 +662,14 @@ class Moon extends CelestialBody {
         // }
     }
 
+    UnloadCheck() {
+        console.log("MOON UNLOAD CHECK TRIGGERED");
+        if (this.id.toString()[0] != previousFocus.id.toString()[0]) {
+            console.log("THIS AND PREV IDS are equal", (this.id.toString()[0] == previousFocus.id.toString()[0]));
+            unloadPlanetGroup(Number(previousFocus.id.toString()[0]));
+        }
+    }
+
     ToggleFocusState(command) {
         // Вызов метода родительского класса CelestialBody
         super.ToggleFocusState(command);
@@ -645,6 +685,7 @@ class Moon extends CelestialBody {
                     focusObject.parent.moons[i].markerLabelELem.style.visibility = "visible";
                 }
             }
+            this.UnloadCheck();
             changeFocusedObject();
         } else {
             for (let i = 0; i < focusObject.parent.moons.length; i++) {
