@@ -67,21 +67,17 @@ scene.background = new THREE.CubeTextureLoader()
     labelRenderer.domElement.style.top = '0px';
     // labelRenderer.domElement.style.pointerEvents = 'none';
     document.body.appendChild(labelRenderer.domElement); 
-    console.log(labelRenderer);
+    // console.log('LABEL RENDERER INFO", labelRenderer);
 
     // Установка размера для потока вывода изображения
     renderer.setSize(window.innerWidth, window.innerHeight);
     
-    console.log("ANISOTROPY", renderer.capabilities.getMaxAnisotropy());
-    
     
     // Заполняющий свет, чтобы неосвещенные участки планет не были просто черными пятнами
-    const AmbientLighting = new THREE.AmbientLight(0xffffff, 0.015);
-    scene.add(AmbientLighting);
 
     // Добавление объектов на сцену
     function init() {
-        console.log(celestialBodiesMeshesList[0]);
+        // console.log("SUN", celestialBodiesMeshesList[0]);
         scene.add(celestialBodiesMeshesList[0].starGroup);
         for (let i = 1; i < celestialBodiesMeshesList.length; i++) {
             scene.add(celestialBodiesMeshesList[i].groups.subsidiaryGroup);
@@ -193,7 +189,6 @@ scene.background = new THREE.CubeTextureLoader()
     // Вторая "ложная" камера для реализации слежения за движущимся объектом
     const fakeCamera = camera.clone();
     fakeCamera.rotation.set(0, 0, 0);
-    console.log("init rotation", camera.rotation, fakeCamera.rotation);
     const controls = new OrbitControls(fakeCamera, canvas);
     controls.maxDistance = CAMERA_MAX_DISTANCE;
     controls.enablePan = ENABLE_PAN; // Отключение возможности изменения центра вращения камеры "перетаскиванием"
@@ -211,13 +206,13 @@ scene.background = new THREE.CubeTextureLoader()
     // Функция обновления минимальной дистанции, в зависимости
     // от радиуса объекта
     function updateControlsParams() {
-        console.log(focusObject, focusObject.radius);
+        // console.log("NEW FOCUS AND IT'S RADIUS", focusObject, focusObject.radius);
         if(focusObject.id == 0) {
             controls.minDistance = (focusObject.radius / SCALE_DIVIDER) * 1.2;
         } else {
             controls.minDistance = (focusObject.radius / SCALE_DIVIDER) * 2;
         }
-        console.log("NEW MIN DIST", controls.minDistance);
+        // console.log("NEW MIN DIST", controls.minDistance);
     }
 
     
@@ -236,9 +231,7 @@ scene.background = new THREE.CubeTextureLoader()
 
     function unloadPlanetGroup(id) {
         if(id != 0) {
-            console.log("UNLOAD FUNC");
-            console.log(id);
-            console.log(celestialBodiesMeshesList[id].groups.meshMoonsGroup);
+            console.log("UNLOAD FUNC TRIGGERED");
             scene.remove(celestialBodiesMeshesList[id].groups.meshMoonsGroup);
         }
     };
@@ -267,11 +260,11 @@ scene.background = new THREE.CubeTextureLoader()
             fakeCamera.position.x = controls.minDistance * 1.5;
             fakeCamera.position.y = 0;
             fakeCamera.position.z = controls.minDistance;
-            console.log("FAKE CAM POS", fakeCamera.position);
         }
         
         camera.copy(fakeCamera);
-        console.log(fakeCamera.rotation);
+
+
         console.log(renderer.info);
     }
 
@@ -321,8 +314,6 @@ uniformData.u_time.value = clock.getElapsed();
 
         camera.copy(fakeCamera);
 
-        // console.log(controls.getDistance());
-
         // Вызов функции рендера с переданными в нее сценой и камерой (по сути - создание кадра)
         renderer.render(scene, camera);
         labelRenderer.render(scene, camera);
@@ -340,9 +331,9 @@ uniformData.u_time.value = clock.getElapsed();
 
     init();
     updateControlsParams();
+    console.log("RENDERER INFO", renderer.info);
     renderLoop();
 
-    console.log(renderer.info);
 
 // [-------] Вызов функций инициализации и активация цикла отрисовки [-------]
 

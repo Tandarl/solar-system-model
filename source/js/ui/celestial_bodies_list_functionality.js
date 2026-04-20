@@ -64,7 +64,6 @@ const CelestialBodiesList = {
 
                         } else {
                             // Переключение фокуса на спутник
-                            console.log("LIST||||| ", celestialBodiesMeshesList[Number((targetID.charAt(0)))].moons[(Number((targetID.charAt(1))) - 1)]);
                             celestialBodiesMeshesList[Number((targetID.charAt(0)))].moons[(Number((targetID.charAt(1))) -1)].ToggleFocusState(1);
                         }
                     }

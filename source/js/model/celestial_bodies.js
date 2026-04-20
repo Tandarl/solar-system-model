@@ -51,8 +51,6 @@ const SCALE_DIV = 10000;
     import testVertexShader from "../../shaders/test/vertex.glsl";
 
 
-// Интенсивность солнечного света  (условные единицы)
-const SUN_LIGHT_IMITATOR_INTENSITY = 1e4; // 2.8e5
 // Скорость времени (количество секунд модели в секунду реального времени)
 const timeSpeed = 60;
 
@@ -135,20 +133,12 @@ class CelestialBody {
     }
 
     ToggleFocusState(command) {
-        console.log("clicked", command);
+        console.log("focus state toggle", command);
         if(command) {
             this.textLabelElem.style.visibility = "hidden";
             this.markerLabelELem.style.visibility = "hidden";
         } else {
             previousFocus.id = this.id;
-            console.log("PREVIOUS ID", previousFocus.id);
-            // if(this.id < 10 && this.id != 0) {
-            //     console.log("CALL ID", this.id);
-            //     unloadPlanetGroup(this.id);
-            // } else if(this.id > 10) {
-            //     console.log("CALL ID", this.id);
-            //     unloadPlanetGroup(Number(this.id.toString()[0]));
-            // }
 
             this.textLabelElem.style.visibility = "visible";
             this.markerLabelELem.style.visibility = "visible";
@@ -208,7 +198,6 @@ class Star extends CelestialBody {
 
     Update(delta) {
         this.UpdateRotation(delta);
-        // console.log(uniformData.uSunDirection);
     }
 
     UnloadCheck() {
@@ -297,7 +286,6 @@ class Planet extends CelestialBody {
             this.planetUniforms = THREE.UniformsUtils.clone(uniformData);
             this.planetUniforms.uSurfaceTexture = new THREE.Uniform(this.textures.surfaceTexture);
             this.planetUniforms.id = obj.id;
-            console.log(this.planetUniforms)
 
             this.planetUniforms.uAtmosphereDayColor = new THREE.Uniform(new THREE.Color(this.AtmosphereDayColor));
             this.planetUniforms.uAtmosphereTwilightColor = new THREE.Uniform(new THREE.Color(this.AtmosphereTwilightColor));
@@ -481,8 +469,6 @@ class Planet extends CelestialBody {
 
     UnloadCheck() {
         if(this.id.toString()[0] != previousFocus.id.toString()[0]) {
-            // console.log("THIS AND PREV IDS are equal", (this.id.toString()[0] == previousFocus.id.toString()[0]));
-            // console.log(previousFocus.id.toString()[0]);
             unloadPlanetGroup(Number(previousFocus.id.toString()[0]));
         }
     }
@@ -537,9 +523,6 @@ class Moon extends CelestialBody {
         this.planetUniforms.id = obj.id;
         this.planetUniforms.uPlanetRadius = new THREE.Uniform(this.parent.radius / SCALE_DIV);
         this.planetUniforms.uSquaredPlanetRadius = new THREE.Uniform((this.parent.radius / SCALE_DIV) * (this.parent.radius / SCALE_DIV));
-        // this.planetUniforms.uPlanetRadius = new THREE.Uniform((parent.radius / SCALE_DIV));
-        console.log("MOONS UNIFORMS", parent.mesh.position);
-        console.log("PLANTER RADIUS", this.planetUniforms.uPlanetRadius);
 
         this.planetUniforms.uAtmosphereDayColor = new THREE.Uniform(new THREE.Color(this.AtmosphereDayColor));
         this.planetUniforms.uAtmosphereTwilightColor = new THREE.Uniform(new THREE.Color(this.AtmosphereTwilightColor));
@@ -553,7 +536,6 @@ class Moon extends CelestialBody {
         });
         this.mesh.material = this.material;
 
-        console.log("RECEIVED PARENT", parent);
         // this.parentObject = parent;
 
         this.SpeedParams = {
@@ -561,13 +543,6 @@ class Moon extends CelestialBody {
             OrbitalVelocity: (obj.orbit_parameters["орбитальная скорость"].replace(/[^\d.-]/g, '')) / (obj.mediumDistanceFromParentObject),
         }
 
-        
-        console.log("MOON CHECK", celestialBodiesMeshesList);
-        // TEMPORARY !!!
-        // this.material = new THREE.MeshStandardMaterial({
-        //     map: textureLoader.load(`./assets/textures/31/texture.jpg`),
-        //     //  wireframe: true // Toggle to show geometry
-        // });
         this.markerColor = moonsIOColors[this.id % 5];
         // По умолчанию лейбл и название скрыты
         this.textLabelElem.style.visibility = "hidden";
@@ -581,7 +556,6 @@ class Moon extends CelestialBody {
         
         this.distance = (obj.mediumDistanceFromParentObject / SCALE_DIV) + parent.distance;
         this.distToParent = (obj.mediumDistanceFromParentObject / SCALE_DIV);
-        // console.log("DISTANCE", this.distance, this.parentObject.distance);
 
         
         this.orbitRadius = obj.mediumDistanceFromParentObject / SCALE_DIV;
@@ -635,7 +609,7 @@ class Moon extends CelestialBody {
         this.meshWorldPos = new THREE.Vector3(0, 0, 0);
         this.mesh.getWorldPosition(this.meshWorldPos);
         this.planetUniforms.uMeshWorldPos = new THREE.Uniform(this.meshWorldPos);
-        console.log("MOON GROUP POS", this.planetUniforms.uPlanetPosition, this.meshWorldPos);
+        // console.log("MOON GROUP POS", this.planetUniforms.uPlanetPosition, this.meshWorldPos);
     }
 
     UpdateRotation(delta) {
@@ -651,21 +625,16 @@ class Moon extends CelestialBody {
         this.UpdatePosition(delta);
 
         // console.log(this.moonGroup.position.x);
-        // this.planetUniforms.uPlanetPosition.value.copy(new THREE.Vector3(this.moonGroup.getWorldPosition()));
         this.moonGroup.getWorldPosition(this.planetPos);
         this.planetUniforms.uPlanetPosition.value.copy(this.planetPos);
 
         this.mesh.getWorldPosition(this.meshWorldPos);
         this.planetUniforms.uMeshWorldPos.value.copy(this.meshWorldPos);
-        // if(this.id == 42) {
-            // console.log(this.planetUniforms);
-        // }
     }
 
     UnloadCheck() {
         console.log("MOON UNLOAD CHECK TRIGGERED");
         if (this.id.toString()[0] != previousFocus.id.toString()[0]) {
-            console.log("THIS AND PREV IDS are equal", (this.id.toString()[0] == previousFocus.id.toString()[0]));
             unloadPlanetGroup(Number(previousFocus.id.toString()[0]));
         }
     }
@@ -703,18 +672,15 @@ let celestialBodiesMeshesList = [];
 for(let obj of celestialBodiesData) {
     if(obj.id == 0) celestialBodiesMeshesList.push(new Star(obj));
     else if(obj.id < 9) celestialBodiesMeshesList.push(new Planet(obj)); // < 9
-    // else if(obj.id >= 10) celestialBodiesMeshesList.push(new Moon(obj));
 }
-console.log(celestialBodiesMeshesList);
-console.log(celestialBodiesMeshesList.length);
+console.log("MAIN MESHES LIST",celestialBodiesMeshesList);
+console.log("IT'S LENGTH", celestialBodiesMeshesList.length);
 
-// const testMoon = new Moon(celestialBodiesData[4]);
-// celestialBodiesMeshesList.push(testMoon);
-console.log("DATA", celestialBodiesData);
+// console.log("DATA", celestialBodiesData);
 
 
 let focusObject = celestialBodiesMeshesList[0];
-console.log(`focusObject:`, focusObject);
+// console.log(`focusObject:`, focusObject);
 
 
 export {celestialBodiesMeshesList, focusObject, uniformData};
