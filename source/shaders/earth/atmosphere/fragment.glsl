@@ -19,15 +19,18 @@ void main(){
     float sunOrientation = dot(normal, LightDirection);
 
     // Atmosphere
-    float atmosphereDayMix = smoothstep(-0.5, 1.0, sunOrientation);
+    float atmosphereDayMix = smoothstep(-0.5, 0.7, sunOrientation);
+    // float atmosphereDayMix = smoothstep(-0.5, 1.0, sunOrientation);
     vec3 atmosphereColor = mix(uEarthAtmosphereTwilightColor, uEarthAtmosphereDayColor, atmosphereDayMix); 
     color += atmosphereColor;
 
     // Alpha
     float edgeAlpha = dot(viewDirection, normal);
     edgeAlpha = smoothstep(0.0, 0.5, edgeAlpha);
+    // edgeAlpha = smoothstep(0.0, 0.5, edgeAlpha);
     
     float nightAlpha = smoothstep(-0.5, 0.0, sunOrientation);
+    // float nightAlpha = smoothstep(-0.6, 0.0, sunOrientation);
 
     float alpha = edgeAlpha * nightAlpha;
 
