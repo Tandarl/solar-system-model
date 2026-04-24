@@ -71,7 +71,8 @@ class CelestialBody {
         this.id = obj.id;
 
         
-        this.geometry = new THREE.IcosahedronGeometry(obj.radius/SCALE_DIV, 12);
+        // this.geometry = new THREE.IcosahedronGeometry(obj.radius/SCALE_DIV, 12);
+        this.geometry = new THREE.SphereGeometry(obj.radius / SCALE_DIV, 32, 32);
         // this.geometry = new THREE.SphereGeometry(obj.radius / SCALE_DIV, 42, 42);
 
         this.material = new THREE.ShaderMaterial({
