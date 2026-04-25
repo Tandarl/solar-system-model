@@ -487,7 +487,9 @@ class Planet extends CelestialBody {
 
             this.ringsMesh = new THREE.Mesh(this.ringsGeometry, this.ringsMaterial);
             this.ringsMesh.position.set(this.distance, 0, 0);
-            this.ringsMesh.rotation.x = (Math.PI / 2) + (obj.tilt * (Math.PI / 180)); 
+            // this.ringsMesh.rotation.x = (Math.PI / 2) - (obj.tilt * (Math.PI / 180)); 
+            this.ringsMesh.rotation.x = (Math.PI / 2);
+            this.ringsMesh.rotation.y = degToRad(obj.tilt);
             
             this.groups.meshMoonsGroup.add(this.ringsMesh);
         }
