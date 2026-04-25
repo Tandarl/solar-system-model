@@ -9,7 +9,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@100..900&display=swap" rel="stylesheet">
+
     <!-- CSS -->
+     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/range-slider-element@2/dist/range-slider-element.css">
      <!-- <link rel="stylesheet" href="./main.css"> -->
     <title>Модель Солнечной системы</title>
 </head>
@@ -102,6 +104,10 @@
         </div>
     </main>
     <div id="side-panel__expand-button" class="expand-side-panel-button icon-button-desktop hidden"><img src="./assets/icons/arrows_icon.svg" alt="expand" class="expand-side-panel-icon"></div>
+    <div class="time-slider-container">
+        <range-slider min="0" max="4" step="1" value="0"></range-slider>
+        <output>стандартный темп</output>
+    </div>
     <div class="top-right-menu">
         <img id="objects-list-panel__expand-button" class="top-right-menu__burger-menu icon-button-desktop" src="./assets/icons/burger-menu.svg" alt="objects list">
     </div>

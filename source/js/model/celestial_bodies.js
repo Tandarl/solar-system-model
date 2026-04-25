@@ -5,6 +5,7 @@ import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
 import {CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 import { changeFocusedObject, unloadPlanetGroup} from './model_basic';
 import { degToRad } from 'three/src/math/MathUtils.js';
+import 'range-slider-element';
 
 
 const SCALE_DIV = 10000;
@@ -22,7 +23,6 @@ const SCALE_DIV = 10000;
     }
 
     // [-------] Uniforms для шейдеров [-------]
-    // import { uniformData } from './model_basic.js';
 
     // Общий vertex shader для мешей небесных тел
     import generalBodyVertexShader from "../../shaders/general_vertex/celestial_body_vertex.glsl";
@@ -48,10 +48,12 @@ const SCALE_DIV = 10000;
     // Тестовые шейдеры
     import testFragmentShader from "../../shaders/test/fragment.glsl";
     import testVertexShader from "../../shaders/test/vertex.glsl";
+import { RangeSliderElement } from 'range-slider-element';
+import { time } from 'three/tsl';
 
 
 // Скорость времени (количество секунд модели в секунду реального времени)
-const timeSpeed = 60;
+let timeSpeed = 1;
 
 const previousFocus = {
     id: 0
@@ -62,6 +64,82 @@ const moonsIOColors = ["#c49227", "#c7620e", "#ef9764", "#f1d168", "#6661e7"];
 
 // Инициализация загрузчика текстур
 const textureLoader = new THREE.TextureLoader();
+
+const timeController = {
+    sliderElement: 0,
+    outputElement: 0,
+    sliderValue: 0,
+    outputString: "",
+
+    init() {
+        this.sliderElement = document.querySelector("range-slider");
+        this.outputElement = document.querySelector("output");
+        
+        this.outputElement.value = "стандартный темп";
+        
+        console.log("OUTPUT ELEM", this.outputElement)
+        // this.sliderElement.addEventListener("input", (event) => {
+        //     this.sliderValue = event.target.value;
+            
+        //     if(this.sliderValue == 0) {
+        //         this.outputElement.value = "нормальный темп";
+        //         timeSpeed = 1;
+
+        //     } else if(this.sliderValue == 1) {
+        //         this.outputElement.value = "1 час/сек р.в.";
+        //         timeSpeed = 3600;
+
+        //     } else if(this.sliderValue == 2) {
+        //         this.outputElement.value = "1 день/сек р.в.";
+        //         timeSpeed = 86400;
+
+        //     }else if(this.sliderValue == 3) {
+        //         this.outputElement.value = "1 мес/сек р.в.";
+        //         timeSpeed = 2592000;
+
+        //     } else if(this.sliderValue == 4) {
+        //         this.outputElement.value = "1 год/сек р.в.";
+        //         timeSpeed = 31557600;
+
+        //     }
+        // });
+
+        this.sliderElement.addEventListener("change", (event) => {
+            this.sliderValue = event.target.value;
+
+            if (this.sliderValue == 0) {
+                this.outputElement.value = "нормальный темп";
+                timeSpeed = 1;
+
+            } else if (this.sliderValue == 1) {
+                this.outputElement.value = "1 час/сек р.в.";
+                timeSpeed = 3600;
+
+            } else if (this.sliderValue == 2) {
+                this.outputElement.value = "1 день/сек р.в.";
+                timeSpeed = 86400;
+
+            } else if (this.sliderValue == 3) {
+                this.outputElement.value = "1 мес/сек р.в.";
+                timeSpeed = 2592000;
+
+            } else if (this.sliderValue == 4) {
+                this.outputElement.value = "1 год/сек р.в.";
+                timeSpeed = 31557600;
+
+            }
+        });
+    },
+    
+    // reflectValue: (event) => (
+    //     this.outputElement.value = event.target.value
+    // ),
+    reflectValue() {
+        // this.outputElement.value = this.sliderElement.value;
+        console.log("REFLECT", this.outputElement);
+        console.log(this.sliderElement.value);
+    }
+}
 
 
 class CelestialBody {
@@ -74,11 +152,6 @@ class CelestialBody {
         // this.geometry = new THREE.IcosahedronGeometry(obj.radius/SCALE_DIV, 12);
         this.geometry = new THREE.SphereGeometry(obj.radius / SCALE_DIV, 32, 32);
         // this.geometry = new THREE.SphereGeometry(obj.radius / SCALE_DIV, 42, 42);
-
-        this.material = new THREE.ShaderMaterial({
-            // flatShading: true, Toggle to show polygons
-            //  wireframe: true // Toggle to show geometry
-        });
         
         this.mesh = new THREE.Mesh(this.geometry, this.material);
         
@@ -154,6 +227,8 @@ class CelestialBody {
 class Star extends CelestialBody {
     constructor(obj) {
         super(obj);
+
+        this.geometry = new THREE.IcosahedronGeometry(obj.radius / SCALE_DIV, 14);
 
         this.SpeedParams = {
             RotationAroundAxisVelocity: ((obj.body_parameters["скорость вращения вокруг своей оси"].replace(/[^\d.-]/g, ''))) / (obj.radius * SCALE_DIV),
@@ -231,8 +306,10 @@ class Planet extends CelestialBody {
             RotationAroundAxisVelocity: ((obj.body_parameters["скорость вращения вокруг своей оси"].replace(/[^\d.-]/g, '')) * SCALE_DIV) / (obj.radius * 1000 * SCALE_DIV),
         }
 
+        // this.geometry = new THREE.SphereGeometry(obj.radius / SCALE_DIV, 64, 25);
         this.geometry = new THREE.SphereGeometry(obj.radius / SCALE_DIV, 32, 32);
-        // this.geometry = new THREE.IcosahedronGeometry(obj.radius / SCALE_DIV, 12);
+        this.geometry.computeVertexNormals();
+        // this.geometry = new THREE.IcosahedronGeometry(obj.radius / SCALE_DIV, 18);
         
         this.material = new THREE.ShaderMaterial({});
 
@@ -259,6 +336,8 @@ class Planet extends CelestialBody {
             this.textures = {
                 surfaceTexture: textureLoader.load(`./assets/textures/${obj.id}/texture.jpg`)
             }
+            this.textures.surfaceTexture.anisotropy = 8;
+
             if(obj.id == 1) {
                 this.AtmosphereDayColor = '#c4c4c4';
                 this.AtmosphereTwilightColor = '#636363';
@@ -388,6 +467,24 @@ class Planet extends CelestialBody {
                 emissiveIntensity: 1,
             });
 
+
+            if (obj.id == 6) {
+                this.ringsUniforms = {
+                    ringsTexture: 0
+                }
+                this.ringsUniforms.ringsTexture = new THREE.Uniform(textureLoader.load(`./assets/textures/${obj.id}/rings_texture.jpg`));
+                this.ringsUniforms.ringsTexture.anisotropy = 8;
+                this.ringsMaterial = new THREE.MeshBasicMaterial({
+                    side: THREE.DoubleSide,
+                    transparent: true,
+                    map: textureLoader.load(`./assets/textures/${obj.id}/rings_texture.jpg`),
+                    // emissive: 0x141414,
+                    // emissiveIntensity: 1.5,  
+                });
+            }
+
+            this.ringsMaterial.map.anisotropy = 8;
+
             this.ringsMesh = new THREE.Mesh(this.ringsGeometry, this.ringsMaterial);
             this.ringsMesh.position.set(this.distance, 0, 0);
             this.ringsMesh.rotation.x = (Math.PI / 2) + (obj.tilt * (Math.PI / 180)); 
@@ -454,7 +551,11 @@ class Planet extends CelestialBody {
     }
 
     UpdateRotation(delta) {
-        super.UpdateRotation(delta);
+        if(this.id != 7) {
+            super.UpdateRotation(delta);
+        } else {
+
+        }
     }
 
     Update(delta) {
@@ -512,6 +613,8 @@ class Moon extends CelestialBody {
                 surfaceTexture: textureLoader.load(`./assets/textures/${obj.id}/texture.jpg`)
             }
         }
+
+        this.textures.surfaceTexture.anisotropy = 8;
 
        
         if (obj.id in [31, 41, 42]) {
@@ -599,7 +702,7 @@ class Moon extends CelestialBody {
         this.moonGroup.position.set(parent.distance, 0, 0);
 
         if(this.id == 31) {
-            this.mesh.rotateY((2 * Math.PI) / 3);
+            this.mesh.rotateY((2 * Math.PI) / 2);
         }
 
         // this.planetUniforms.uPlanetPosition = new THREE.Uniform(new THREE.Vector3(this.moonGroup.position.x, this.moonGroup.position.y, this.moonGroup.position.z));
@@ -682,6 +785,8 @@ console.log("IT'S LENGTH", celestialBodiesMeshesList.length);
 
 let focusObject = celestialBodiesMeshesList[0];
 // console.log(`focusObject:`, focusObject);
+
+timeController.init();
 
 
 export {celestialBodiesMeshesList, focusObject, uniformData};
