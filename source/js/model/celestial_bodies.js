@@ -322,7 +322,9 @@ class Planet extends CelestialBody {
             GeneralGroup: new THREE.Group(),
             axisTiltGroup: new THREE.Group(),
             subsidiaryGroup: new THREE.Group(),
-            meshMoonsGroup: new THREE.Group()
+            meshMoonsGroup: new THREE.Group(),
+            subsidiaryGrandGroup: new THREE.Group(),
+            meshMoonsGrandGroup: new THREE.Group(),
         }
         // subsidiaryGroup это отдельная группа для орбиты и вспомогательного объекта, т.к орбита отображается всегда, и к вспомогательному объекту прикреплены лейбл и метка
 
@@ -516,7 +518,8 @@ class Planet extends CelestialBody {
 
         
         // Вспомогательный объект, к которому будет прикреплена камера
-        this.auxiliaryCubeGeometry = new THREE.BoxGeometry(0.001, 0.001, 0.001);
+        this.auxiliaryCubeSize = (this.radius / SCALE_DIV) / 10;
+        this.auxiliaryCubeGeometry = new THREE.BoxGeometry(this.auxiliaryCubeSize, this.auxiliaryCubeSize, this.auxiliaryCubeSize);
         this.auxiliaryCubeMaterial = new THREE.MeshBasicMaterial({color: 0xff0000});
         this.auxiliaryCubeMesh = new THREE.Mesh(this.auxiliaryCubeGeometry, this.auxiliaryCubeMaterial);
         this.auxiliaryCubeMesh.position.set(this.distance, 0, 0);
@@ -534,24 +537,35 @@ class Planet extends CelestialBody {
         
         // Центр группы расположен в точке начала координат, что упрощает реализацию вращения планеты вокруг Солнца
         this.groups.GeneralGroup.position.set(0, 0, 0);
-        
+
+        this.groups.meshMoonsGrandGroup.position.set(0, 0, 0);
+        this.groups.subsidiaryGrandGroup.position.set(0, 0, 0);
+
+        this.groups.subsidiaryGrandGroup.add(this.groups.subsidiaryGroup);
+        this.groups.meshMoonsGrandGroup.add(this.groups.meshMoonsGroup);
+
         // Размещение планеты на своем месте
         this.groups.axisTiltGroup.position.set(this.distance, 0, 0);
-
-
         this.groups.meshMoonsGroup.add(this.groups.axisTiltGroup);
 
         this.groups.subsidiaryGroup.add(this.orbit);
         this.groups.subsidiaryGroup.add(this.auxiliaryCubeMesh);
 
-        this.groups.GeneralGroup.add(this.groups.meshMoonsGroup);
-        this.groups.GeneralGroup.add(this.groups.subsidiaryGroup);
+        if (this.id == 1) {
+            console.log("MERCURY");
+            this.groups.subsidiaryGrandGroup.rotation.z = degToRad(45);
+            this.groups.meshMoonsGrandGroup.rotation.z = degToRad(45);
+        }
+
+        // this.groups.GeneralGroup.add(this.groups.meshMoonsGroup);
+        // this.groups.GeneralGroup.add(this.groups.subsidiaryGroup);
     }
 
     UpdatePosition(delta) {
         let movement = this.SpeedParams.OrbitalVelocity * delta * timeSpeed;
         this.groups.subsidiaryGroup.rotation.y += movement;
         this.groups.meshMoonsGroup.rotation.y += movement;
+        // this.groups.GeneralGroup.rotation.y += movement;
     }
 
     UpdateRotation(delta) {
@@ -604,14 +618,8 @@ class Moon extends CelestialBody {
 
         this.parent = parent;
 
-        if (obj.id == 41 || obj.id == 42) {
-            this.textures = {
-                surfaceTexture: textureLoader.load(`./assets/textures/41/texture.png`)
-            }
-        } else {
-            this.textures = {
-                surfaceTexture: textureLoader.load(`./assets/textures/${obj.id}/texture.jpg`)
-            }
+        this.textures = {
+            surfaceTexture: textureLoader.load(`./assets/textures/${obj.id}/texture.jpg`)
         }
 
         this.textures.surfaceTexture.anisotropy = 8;

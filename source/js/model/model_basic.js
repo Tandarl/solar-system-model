@@ -80,7 +80,7 @@ scene.background = new THREE.CubeTextureLoader()
         // console.log("SUN", celestialBodiesMeshesList[0]);
         scene.add(celestialBodiesMeshesList[0].starGroup);
         for (let i = 1; i < celestialBodiesMeshesList.length; i++) {
-            scene.add(celestialBodiesMeshesList[i].groups.subsidiaryGroup);
+            scene.add(celestialBodiesMeshesList[i].groups.subsidiaryGrandGroup);
         }
     }
 
@@ -232,7 +232,7 @@ scene.background = new THREE.CubeTextureLoader()
     function unloadPlanetGroup(id) {
         if(id != 0) {
             console.log("UNLOAD FUNC TRIGGERED");
-            scene.remove(celestialBodiesMeshesList[id].groups.meshMoonsGroup);
+            scene.remove(celestialBodiesMeshesList[id].groups.meshMoonsGrandGroup);
         }
     };
 
@@ -241,7 +241,7 @@ scene.background = new THREE.CubeTextureLoader()
         updateControlsParams();
 
         if(focusObject.id < 10 && focusObject.id != 0) {
-            scene.add(celestialBodiesMeshesList[focusObject.id].groups.meshMoonsGroup);
+            scene.add(celestialBodiesMeshesList[focusObject.id].groups.meshMoonsGrandGroup);
         } else if(focusObject.id > 10) {
             scene.add(celestialBodiesMeshesList[Number(focusObject.id.toString()[0])].groups.meshMoonsGroup);
         }
