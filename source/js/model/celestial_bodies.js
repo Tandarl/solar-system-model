@@ -154,8 +154,6 @@ class CelestialBody {
         // this.geometry = new THREE.SphereGeometry(obj.radius / SCALE_DIV, 42, 42);
         
         this.mesh = new THREE.Mesh(this.geometry, this.material);
-        
-        this.mesh.rotation.z = obj.tilt * (Math.PI / 180);
 
 
         // Текстовый лейбл с именем, прикрепляемый к объекту
@@ -323,13 +321,11 @@ class Planet extends CelestialBody {
 
         this.groups = {
             GeneralGroup: new THREE.Group(),
+            axisTiltGroup: new THREE.Group(),
             subsidiaryGroup: new THREE.Group(),
             meshMoonsGroup: new THREE.Group()
         }
         // subsidiaryGroup это отдельная группа для орбиты и вспомогательного объекта, т.к орбита отображается всегда, и к вспомогательному объекту прикреплены лейбл и метка
-
-        // создание группы мешей планеты, в которую позже будут добавлены меши самой планеты, ее орбиты и прочих вспомогательных объектов (см. код ниже для подробностей)
-        // this.planetGroup = new THREE.Group();
 
 
         if(obj.id < 10 && obj.id != 3) {
@@ -417,11 +413,11 @@ class Planet extends CelestialBody {
             });
             this.atmosphere = new THREE.Mesh(this.geometry, this.atmosphereMaterial);
             this.atmosphere.scale.set(1.04, 1.04, 1.04);
-            this.atmosphere.position.set(this.distance, 0, 0);
-            this.groups.meshMoonsGroup.add(this.atmosphere);
+            this.groups.axisTiltGroup.add(this.atmosphere);
             
             this.groups.subsidiaryGroup.rotation.y = Math.PI;
             this.groups.meshMoonsGroup.rotation.y = Math.PI;
+            this.groups.axisTiltGroup.rotation.y = Math.PI;
 
             console.log("EARTH POSITION", this.mesh.position);
 
@@ -441,8 +437,7 @@ class Planet extends CelestialBody {
             });
             this.atmosphere = new THREE.Mesh(this.geometry, this.atmosphereMaterial);
             this.atmosphere.scale.set(1.03, 1.03, 1.03);
-            this.atmosphere.position.set(this.distance, 0, 0);
-            this.groups.meshMoonsGroup.add(this.atmosphere);
+            this.groups.axisTiltGroup.add(this.atmosphere);
 
             this.moons.push(new Moon(celestialBodiesData[6], this));
             this.moons.push(new Moon(celestialBodiesData[7], this));
@@ -470,10 +465,10 @@ class Planet extends CelestialBody {
 
             if (obj.id == 6) {
                 this.ringsUniforms = {
-                    ringsTexture: 0
+                    uRingsTexture: 0
                 }
-                this.ringsUniforms.ringsTexture = new THREE.Uniform(textureLoader.load(`./assets/textures/${obj.id}/rings_texture.jpg`));
-                this.ringsUniforms.ringsTexture.anisotropy = 8;
+                this.ringsUniforms.uRingsTexture = new THREE.Uniform(textureLoader.load(`./assets/textures/${obj.id}/rings_texture.jpg`));
+                this.ringsUniforms.uRingsTexture.anisotropy = 8;
                 this.ringsMaterial = new THREE.MeshBasicMaterial({
                     side: THREE.DoubleSide,
                     transparent: true,
@@ -486,12 +481,9 @@ class Planet extends CelestialBody {
             this.ringsMaterial.map.anisotropy = 8;
 
             this.ringsMesh = new THREE.Mesh(this.ringsGeometry, this.ringsMaterial);
-            this.ringsMesh.position.set(this.distance, 0, 0);
-            // this.ringsMesh.rotation.x = (Math.PI / 2) - (obj.tilt * (Math.PI / 180)); 
             this.ringsMesh.rotation.x = (Math.PI / 2);
-            this.ringsMesh.rotation.y = degToRad(obj.tilt);
             
-            this.groups.meshMoonsGroup.add(this.ringsMesh);
+            this.groups.axisTiltGroup.add(this.ringsMesh);
         }
 
         // Радиус самой дальней орбиты спутника (если есть)
@@ -501,8 +493,8 @@ class Planet extends CelestialBody {
 
         // Применение соответствующих материалов к мешам
         this.mesh.material = this.material;
-        
-        this.mesh.position.set(this.distance, 0, 0);
+    
+        this.groups.axisTiltGroup.add(this.mesh);
 
         this.orbitCurve = new THREE.EllipseCurve(
             0, 0, // координаты центра орбиты в ее плоскости
@@ -535,10 +527,17 @@ class Planet extends CelestialBody {
         // Прикрепление лейбла к объекту
         this.auxiliaryCubeMesh.add(this.textLabel);
 
-
+        this.groups.axisTiltGroup.rotation.z = degToRad(obj.tilt);
+        
         // Центр группы расположен в точке начала координат, что упрощает реализацию вращения планеты вокруг Солнца
         this.groups.GeneralGroup.position.set(0, 0, 0);
-        this.groups.meshMoonsGroup.add(this.mesh);
+        
+        // Размещение планеты на своем месте
+        this.groups.axisTiltGroup.position.set(this.distance, 0, 0);
+
+
+        this.groups.meshMoonsGroup.add(this.groups.axisTiltGroup);
+
         this.groups.subsidiaryGroup.add(this.orbit);
         this.groups.subsidiaryGroup.add(this.auxiliaryCubeMesh);
 
@@ -553,11 +552,7 @@ class Planet extends CelestialBody {
     }
 
     UpdateRotation(delta) {
-        if(this.id != 7) {
-            super.UpdateRotation(delta);
-        } else {
-
-        }
+        super.UpdateRotation(delta);
     }
 
     Update(delta) {
@@ -657,6 +652,7 @@ class Moon extends CelestialBody {
         
         
         this.moonGroup = new THREE.Group();
+        this.axisTiltGroup = new THREE.Group();
         
         
         
@@ -680,7 +676,6 @@ class Moon extends CelestialBody {
         this.orbit = new THREE.Line(this.orbitGeometry, this.orbitMaterial);
         // Поворот орбиты на 90 градусов ((Пи/2) радиан соответственно) относительно оси x
         this.orbit.rotation.x = Math.PI / 2;
-        // this.orbit.position.set(this.distance, 0, 0);
         this.orbit.position.set(0, 0, 0);
 
 
@@ -690,15 +685,20 @@ class Moon extends CelestialBody {
 
         this.auxiliaryCubeMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
         this.auxiliaryCubeMesh = new THREE.Mesh(this.auxiliaryCubeGeometry, this.auxiliaryCubeMaterial);
-        this.mesh.position.set(this.orbitRadius, 0, 0);
-        this.auxiliaryCubeMesh.position.copy(this.mesh.position);
+        this.mesh.position.set(0, 0, 0);
+        this.axisTiltGroup.add(this.mesh);
 
+        this.axisTiltGroup.position.set(this.orbitRadius, 0, 0);
+        
+        this.axisTiltGroup.rotation.z = degToRad(obj.tilt);
+        
+        this.auxiliaryCubeMesh.position.set(this.orbitRadius, 0, 0);
         // Прикрепление маркера к объекту
         this.auxiliaryCubeMesh.add(this.markerLabel);
         // Прикрепление лейбла к объекту
         this.auxiliaryCubeMesh.add(this.textLabel);
 
-        this.moonGroup.add(this.mesh);
+        this.moonGroup.add(this.axisTiltGroup);
         this.moonGroup.add(this.orbit);
         this.moonGroup.add(this.auxiliaryCubeMesh);
         this.moonGroup.position.set(parent.distance, 0, 0);
