@@ -305,8 +305,7 @@ class Planet extends CelestialBody {
         }
 
         // this.geometry = new THREE.SphereGeometry(obj.radius / SCALE_DIV, 64, 25);
-        this.geometry = new THREE.SphereGeometry(obj.radius / SCALE_DIV, 32, 32);
-        this.geometry.computeVertexNormals();
+        this.geometry = new THREE.SphereGeometry(obj.radius / SCALE_DIV, 64, 64);
         // this.geometry = new THREE.IcosahedronGeometry(obj.radius / SCALE_DIV, 18);
         
         this.material = new THREE.ShaderMaterial({});
@@ -527,7 +526,11 @@ class Planet extends CelestialBody {
         // Прикрепление лейбла к объекту
         this.auxiliaryCubeMesh.add(this.textLabel);
 
-        this.groups.axisTiltGroup.rotation.z = degToRad(obj.tilt);
+        if(this.id != 7) {
+            this.groups.axisTiltGroup.rotation.x = degToRad(obj.tilt);
+        } else {
+            this.groups.axisTiltGroup.rotation.z = degToRad(obj.tilt);
+        }
         
         // Центр группы расположен в точке начала координат, что упрощает реализацию вращения планеты вокруг Солнца
         this.groups.GeneralGroup.position.set(0, 0, 0);
