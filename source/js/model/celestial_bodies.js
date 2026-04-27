@@ -449,6 +449,13 @@ class Planet extends CelestialBody {
             this.groups.meshMoonsGroup.add(this.moons[1].GeneralGroup);
         }
 
+        if(obj.id == 5) {
+            this.moons.push(new Moon(celestialBodiesData[9], this));
+            this.moons.push(new Moon(celestialBodiesData[10], this));
+            this.moons.push(new Moon(celestialBodiesData[11], this));
+            this.moons.push(new Moon(celestialBodiesData[12], this));
+        }
+
         if(obj.id >= 6 && obj.id < 10) {
             /* Получение из свойств объекта данных о расстоянии самого внутреннего
                 И самого внешнего колец планеты от ее центра */
@@ -479,6 +486,12 @@ class Planet extends CelestialBody {
                     // emissive: 0x141414,
                     // emissiveIntensity: 1.5,  
                 });
+
+                this.moons.push(new Moon(celestialBodiesData[14], this));
+                this.moons.push(new Moon(celestialBodiesData[15], this));
+                this.moons.push(new Moon(celestialBodiesData[16], this));
+                this.moons.push(new Moon(celestialBodiesData[17], this));
+                this.moons.push(new Moon(celestialBodiesData[18], this));
             }
 
             this.ringsMaterial.map.anisotropy = 8;
@@ -489,9 +502,23 @@ class Planet extends CelestialBody {
             this.groups.axisTiltGroup.add(this.ringsMesh);
         }
 
+        if(obj.id == 7) {
+            this.moons.push(new Moon(celestialBodiesData[20], this));
+            this.moons.push(new Moon(celestialBodiesData[21], this));
+            this.moons.push(new Moon(celestialBodiesData[22], this));
+            this.moons.push(new Moon(celestialBodiesData[23], this));
+        }
+
+        if(obj.id == 8) {
+            this.moons.push(new Moon(celestialBodiesData[25], this));
+        }
+
         // Радиус самой дальней орбиты спутника (если есть)
         if (this.moons?.length) {
             this.farthestMoonOrbitRadius = this.moons[this.moons.length - 1].distToParent;
+            for(let i =0; i < this.moons.length; i++) {
+                this.groups.meshMoonsGroup.add(this.moons[i].GeneralGroup);
+            }
         }
 
         // Применение соответствующих материалов к мешам
@@ -520,7 +547,7 @@ class Planet extends CelestialBody {
 
         
         // Вспомогательный объект, к которому будет прикреплена камера
-        this.auxiliaryCubeSize = (this.radius / SCALE_DIV) / 10;
+        this.auxiliaryCubeSize = (this.radius / SCALE_DIV) / 100;
         this.auxiliaryCubeGeometry = new THREE.BoxGeometry(this.auxiliaryCubeSize, this.auxiliaryCubeSize, this.auxiliaryCubeSize);
         this.auxiliaryCubeMaterial = new THREE.MeshBasicMaterial({color: 0xff0000});
         this.auxiliaryCubeMesh = new THREE.Mesh(this.auxiliaryCubeGeometry, this.auxiliaryCubeMaterial);
@@ -619,10 +646,12 @@ class Moon extends CelestialBody {
         this.textures.surfaceTexture.anisotropy = 8;
 
        
-        if (obj.id in [31, 41, 42]) {
-            this.AtmosphereDayColor = '#8d8d8d';
-            this.AtmosphereTwilightColor = '#636363';
-        }
+        // if (obj.id in [31, 41, 42]) {
+        //     this.AtmosphereDayColor = '#8d8d8d';
+        //     this.AtmosphereTwilightColor = '#636363';
+        // }
+        this.AtmosphereDayColor = '#8d8d8d';
+        this.AtmosphereTwilightColor = '#636363';
 
         this.planetUniforms = THREE.UniformsUtils.clone(uniformData);
         this.planetUniforms.uSurfaceTexture = new THREE.Uniform(this.textures.surfaceTexture);
@@ -794,7 +823,7 @@ for(let obj of celestialBodiesData) {
 console.log("MAIN MESHES LIST",celestialBodiesMeshesList);
 console.log("IT'S LENGTH", celestialBodiesMeshesList.length);
 
-// console.log("DATA", celestialBodiesData);
+console.log("DATA", celestialBodiesData);
 
 
 let focusObject = celestialBodiesMeshesList[0];
