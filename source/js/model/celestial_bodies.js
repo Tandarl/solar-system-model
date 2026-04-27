@@ -418,9 +418,9 @@ class Planet extends CelestialBody {
             this.atmosphere.scale.set(1.04, 1.04, 1.04);
             this.groups.axisTiltGroup.add(this.atmosphere);
             
-            this.groups.subsidiaryGroup.rotation.y = Math.PI;
-            this.groups.meshMoonsGroup.rotation.y = Math.PI;
-            this.groups.axisTiltGroup.rotation.y = Math.PI;
+            // this.groups.subsidiaryGroup.rotation.y = Math.PI;
+            // this.groups.meshMoonsGroup.rotation.y = Math.PI;
+            // this.groups.axisTiltGroup.rotation.y = Math.PI;
 
             console.log("EARTH POSITION", this.mesh.position);
 
@@ -580,13 +580,14 @@ class Planet extends CelestialBody {
 
         this.groups.subsidiaryGrandGroup.rotation.z = this.orbitInclination;
         this.groups.meshMoonsGrandGroup.rotation.z = this.orbitInclination;
+
+        this.RandomizePosition();
     }
 
     UpdatePosition(delta) {
         let movement = this.SpeedParams.OrbitalVelocity * delta * timeSpeed;
         this.groups.subsidiaryGroup.rotation.y += movement;
         this.groups.meshMoonsGroup.rotation.y += movement;
-        // this.groups.GeneralGroup.rotation.y += movement;
     }
 
     UpdateRotation(delta) {
@@ -608,6 +609,12 @@ class Planet extends CelestialBody {
         if(this.id.toString()[0] != previousFocus.id.toString()[0]) {
             unloadPlanetGroup(Number(previousFocus.id.toString()[0]));
         }
+    }
+
+    RandomizePosition() {
+        let randomRotation = Math.random() * (Math.PI*2);
+        this.groups.meshMoonsGroup.rotation.y = randomRotation;
+        this.groups.subsidiaryGroup.rotation.y = randomRotation;
     }
 
     ToggleFocusState(command) {
@@ -748,6 +755,8 @@ class Moon extends CelestialBody {
             this.mesh.rotateY((2 * Math.PI) / 2);
         }
 
+        this.RandomizePosition();
+
         // this.planetUniforms.uPlanetPosition = new THREE.Uniform(new THREE.Vector3(this.moonGroup.position.x, this.moonGroup.position.y, this.moonGroup.position.z));
         this.planetPos = new THREE.Vector3(0, 0, 0);
         this.moonGroup.getWorldPosition(this.planetPos);
@@ -784,6 +793,11 @@ class Moon extends CelestialBody {
         if (this.id.toString()[0] != previousFocus.id.toString()[0]) {
             unloadPlanetGroup(Number(previousFocus.id.toString()[0]));
         }
+    }
+
+    RandomizePosition() {
+        let randomRotation = Math.sin(Math.random() * (Math.PI * 2)) * Math.random() + this.id;
+        this.moonGroup.rotation.y = randomRotation;
     }
 
     ToggleFocusState(command) {
