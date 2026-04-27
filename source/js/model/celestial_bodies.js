@@ -195,6 +195,11 @@ class CelestialBody {
         this.textLabel.position.set(0, 0, 0);
         this.textLabel.center.set(0, 0);
         this.textLabel.visible = true;
+
+        this.textLabel.layers.enable(0);
+        this.textLabel.layers.enable(1);
+        this.markerLabel.layers.enable(0);
+        this.markerLabel.layers.enable(1);
     }
 
     UpdateRotation(delta) {
@@ -256,16 +261,25 @@ class Star extends CelestialBody {
         this.auxiliaryCubeMesh = new THREE.Mesh(this.auxiliaryCubeGeometry, this.auxiliaryCubeMaterial);
         this.auxiliaryCubeMesh.position.set(0, 0, 0);
 
+        
+
+
         // Прикрепление маркера к объекту
-        this.mesh.add(this.markerLabel);
+        this.auxiliaryCubeMesh.add(this.markerLabel);
         // Прикрепление лейбла к объекту
-        this.mesh.add(this.textLabel);
+        this.auxiliaryCubeMesh.add(this.textLabel);
         
         this.starGroup = new THREE.Group();
         this.starGroup.position.set(0, 0, 0);
 
         this.starGroup.add(this.mesh);
         this.starGroup.add(this.auxiliaryCubeMesh);
+
+        this.mesh.layers.enable(0);
+        this.mesh.layers.enable(1); 
+
+        this.auxiliaryCubeMesh.layers.enable(0);
+        this.auxiliaryCubeMesh.layers.enable(1);
     }
 
     Update(delta) {
@@ -416,6 +430,10 @@ class Planet extends CelestialBody {
             });
             this.atmosphere = new THREE.Mesh(this.geometry, this.atmosphereMaterial);
             this.atmosphere.scale.set(1.04, 1.04, 1.04);
+            this.atmosphere.layers.enable(0);
+            this.atmosphere.layers.enable(1);
+
+
             this.groups.axisTiltGroup.add(this.atmosphere);
             
             // this.groups.subsidiaryGroup.rotation.y = Math.PI;
@@ -440,13 +458,17 @@ class Planet extends CelestialBody {
             });
             this.atmosphere = new THREE.Mesh(this.geometry, this.atmosphereMaterial);
             this.atmosphere.scale.set(1.03, 1.03, 1.03);
-            this.groups.axisTiltGroup.add(this.atmosphere);
+            this.atmosphere.layers.enable(0);
+            this.atmosphere.layers.enable(1);
 
+
+            this.groups.axisTiltGroup.add(this.atmosphere);
             this.moons.push(new Moon(celestialBodiesData[6], this));
             this.moons.push(new Moon(celestialBodiesData[7], this));
 
             this.groups.meshMoonsGroup.add(this.moons[0].GeneralGroup);
             this.groups.meshMoonsGroup.add(this.moons[1].GeneralGroup);
+
         }
 
         if(obj.id == 5) {
@@ -500,6 +522,9 @@ class Planet extends CelestialBody {
             this.ringsMesh.rotation.x = (Math.PI / 2);
             
             this.groups.axisTiltGroup.add(this.ringsMesh);
+
+            this.ringsMesh.layers.enable(0);
+            this.ringsMesh.layers.enable(1);
         }
 
         if(obj.id == 7) {
@@ -580,6 +605,14 @@ class Planet extends CelestialBody {
 
         this.groups.subsidiaryGrandGroup.rotation.z = this.orbitInclination;
         this.groups.meshMoonsGrandGroup.rotation.z = this.orbitInclination;
+
+        // Распределение по слоям
+        this.auxiliaryCubeMesh.layers.enable(0);
+        this.auxiliaryCubeMesh.layers.enable(1);
+        this.mesh.layers.enable(0);
+        this.mesh.layers.enable(1);
+
+        this.orbit.layers.enable(0);
 
         this.RandomizePosition();
     }
@@ -688,7 +721,14 @@ class Moon extends CelestialBody {
         // Наклонение орбиты планеты относительно плоскости эклиптики
         this.orbitInclination = degToRad(obj.orbitInclination);
 
-        this.markerColor = moonsIOColors[this.id % 5];
+        this.markerColor = moonsIOColors[(this.id) % 5];
+        this.markerLabelELem.style.cssText += `
+            width: 1em;
+            height: 1em;
+            border: 1px solid ${this.markerColor};
+            border-radius: 50%;
+        `;
+
         // По умолчанию лейбл и название скрыты
         this.textLabelElem.style.visibility = "hidden";
         this.markerLabelELem.style.visibility = "hidden";
@@ -748,6 +788,14 @@ class Moon extends CelestialBody {
         this.moonGroup.add(this.auxiliaryCubeMesh);
         this.GeneralGroup.add(this.moonGroup);
         this.GeneralGroup.position.set(parent.distance, 0, 0);
+
+        this.mesh.layers.set(0);
+        this.mesh.layers.enable(1);
+
+        this.auxiliaryCubeMesh.layers.set(0);
+        this.auxiliaryCubeMesh.layers.enable(1);
+
+        this.orbit.layers.enable(0);
 
         this.GeneralGroup.rotation.z = this.orbitInclination;
 

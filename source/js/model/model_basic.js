@@ -82,20 +82,63 @@ scene.background = new THREE.CubeTextureLoader()
         for (let i = 1; i < celestialBodiesMeshesList.length; i++) {
             scene.add(celestialBodiesMeshesList[i].groups.subsidiaryGrandGroup);
         }
+        LabelManager.checkBoxState = true;
+        LabelManager.bindCheckboxOnclickTrigger();
     }
+// [-------] Работа с отображением лейблов у объектов [-------]
+    // Инициализация и настройка камеры
+    const camera = new THREE.PerspectiveCamera(
+        70,
+        window.innerWidth / window.innerHeight,
+        0.0001,
+        4.5e6
+    );
+
+    camera.layers.set(0);
+    // camera.layers.enable(1);
+    
+    // Начальная позиция камеры
+    camera.position.x = -27000;
+    camera.position.y = 29000;
+    camera.position.z = 32000;
+    // camera.position.x = 30000;
+    // camera.position.y = 0;
+    // camera.position.z = 0;
+    
+    // Инициализация и настройка элементов управления камерой
+    
+    // Вторая "ложная" камера для реализации слежения за движущимся объектом
+    const fakeCamera = camera.clone();
+    fakeCamera.rotation.set(0, 0, 0);
+    const controls = new OrbitControls(fakeCamera, canvas);
+    controls.maxDistance = CAMERA_MAX_DISTANCE;
+    controls.enablePan = ENABLE_PAN; // Отключение возможности изменения центра вращения камеры "перетаскиванием"
+    controls.enableDamping = ENABLE_DAMPING; // Эффект "инерции" при вращении камеры. Дает большую иммерсивность
+    controls.zoomSpeed = 8;
+    controls.minDistance = (focusObject.radius / SCALE_DIVIDER) * 1.2;
+
+    fakeCamera.layers.set(0);
+    // fakeCamera.layers.enable(1);
+    
+    controls.addEventListener('change', InitiateLabelsCheck);
+
+
+// [-------] Конец базовой организации модели [-------]
+
+// [-------] Функции обновления состояния камеры и инструментов управления [-------]
 
 // [-------] Работа с отображением лейблов у объектов [-------]
     const LabelManager = {
         previousDistance: 0,
         distance: 0,
-		planetSystemRadius: 0,
+        planetSystemRadius: 0,
 
         hideLabels(from_ID, upTo_ID, hideMarkers) {
             for (let i = from_ID; i <= upTo_ID; i++) {
                 celestialBodiesMeshesList[i].textLabel.visible = false;
-				if(hideMarkers == true) {
-					celestialBodiesMeshesList[i].markerLabel.visible = false;
-				}
+                if (hideMarkers == true) {
+                    celestialBodiesMeshesList[i].markerLabel.visible = false;
+                }
             }
         },
 
@@ -124,84 +167,75 @@ scene.background = new THREE.CubeTextureLoader()
             }
         },
 
-		choosePlanetsAction() {
-			if (this.distance > 185_000) { this.hideLabels(1, 4, false) }
-			else if (this.distance > 1000 && this.distance < 10_000) { this.showLabels(0, 4) }
-			else if (this.distance <= 1200) { this.hideLabels(0, 8, true) }
-			else if (this.distance > 10_000) { this.showLabels(0, 8) }
+        choosePlanetsAction() {
+            if (this.distance > 185_000) { this.hideLabels(1, 4, false) }
+            else if (this.distance > 1000 && this.distance < 10_000) { this.showLabels(0, 4) }
+            else if (this.distance <= 1200) { this.hideLabels(0, 8, true) }
+            else if (this.distance > 10_000) { this.showLabels(0, 8) }
 
-			if(this.distance > 5 && focusObject.id > 10) {this.showLabels(focusObject.parent.id, focusObject.parent.id)}
-		},
+            if (this.distance > 5 && focusObject.id > 10) { this.showLabels(focusObject.parent.id, focusObject.parent.id) }
+        },
 
-		chooseMoonsActon() {
-			if (focusObject.id >= 3) {
-				if(focusObject.id < 10) {
-					this.planetSystemRadius = focusObject.farthestMoonOrbitRadius;
-					if(this.distance > this.planetSystemRadius * 10 || this.distance < controls.minDistance * 1.2) {
-						this.hideMoonsLabels(0, focusObject.moons.length - 1, focusObject);
-					} else {
-						this.showMoonsLabels(0, focusObject.moons.length - 1, focusObject);
-					}
-				} else {
-					this.planetSystemRadius = focusObject.parent.farthestMoonOrbitRadius;
-					if(this.distance > this.planetSystemRadius * 50) {
-						this.hideMoonsLabels(0, focusObject.parent.moons.length - 1, focusObject.parent);
-					} else {
-						this.showMoonsLabels(0, focusObject.parent.moons.length - 1, focusObject.parent);
-					}
-				}
-			}
-		}, 
+        chooseMoonsActon() {
+            if (focusObject.id >= 3) {
+                if (focusObject.id < 10) {
+                    this.planetSystemRadius = focusObject.farthestMoonOrbitRadius;
+                    if (this.distance > this.planetSystemRadius * 10 || this.distance < controls.minDistance * 1.2) {
+                        this.hideMoonsLabels(0, focusObject.moons.length - 1, focusObject);
+                    } else {
+                        this.showMoonsLabels(0, focusObject.moons.length - 1, focusObject);
+                    }
+                } else {
+                    this.planetSystemRadius = focusObject.parent.farthestMoonOrbitRadius;
+                    if (this.distance > this.planetSystemRadius * 50) {
+                        this.hideMoonsLabels(0, focusObject.parent.moons.length - 1, focusObject.parent);
+                    } else {
+                        this.showMoonsLabels(0, focusObject.parent.moons.length - 1, focusObject.parent);
+                    }
+                }
+            }
+        },
 
 
         chooseAction(d) {
             this.distance = d;
-            if(this.distance != this.previousDistance){
+            if (this.distance != this.previousDistance) {
                 // console.log("DISTANCE", d);
                 // Условия для планет
                 this.choosePlanetsAction();
 
                 // Условия для спутников
-				this.chooseMoonsActon();
+                this.chooseMoonsActon();
             }
             this.previousDistance = this.distance;
         },
+
+
+        // Orbits visibility management
+        orbitsIcon: document.getElementById("orbits_icon"),
+        orbitsCheckBox: document.getElementById("orbits_toggle"),
+        checkBoxState: true,
+
+        changeOrbitsVisibility() {
+            console.log("OLD and NEW Orbit visibility state", this.checkBoxState, !this.checkBoxState);
+            this.checkBoxState = !this.checkBoxState;
+            if (this.checkBoxState) {
+                camera.layers.set(0);
+                fakeCamera.layers.set(0);
+            } else {
+                camera.layers.set(1);
+                fakeCamera.layers.set(1);
+            }
+            console.log(camera.layers.test(focusObject.mesh.layers));
+            console.log(camera.layers, focusObject.mesh.layers);
+        },
+
+        bindCheckboxOnclickTrigger() {
+            this.orbitsCheckBox.onclick = this.changeOrbitsVisibility.bind(this);
+            // this.orbitsIcon.onclick = this.changeOrbitsVisibility;
+        },
+
     }
-// [-------] Работа с отображением лейблов у объектов [-------]
-    // Инициализация и настройка камеры
-    const camera = new THREE.PerspectiveCamera(
-        70,
-        window.innerWidth / window.innerHeight,
-        0.0001,
-        4.5e6
-    );
-    
-    // Начальная позиция камеры
-    camera.position.x = -27000;
-    camera.position.y = 29000;
-    camera.position.z = 32000;
-    // camera.position.x = 30000;
-    // camera.position.y = 0;
-    // camera.position.z = 0;
-    
-    // Инициализация и настройка элементов управления камерой
-    
-    // Вторая "ложная" камера для реализации слежения за движущимся объектом
-    const fakeCamera = camera.clone();
-    fakeCamera.rotation.set(0, 0, 0);
-    const controls = new OrbitControls(fakeCamera, canvas);
-    controls.maxDistance = CAMERA_MAX_DISTANCE;
-    controls.enablePan = ENABLE_PAN; // Отключение возможности изменения центра вращения камеры "перетаскиванием"
-    controls.enableDamping = ENABLE_DAMPING; // Эффект "инерции" при вращении камеры. Дает большую иммерсивность
-    controls.zoomSpeed = 8;
-    controls.minDistance = (focusObject.radius / SCALE_DIVIDER) * 1.2;
-    
-    controls.addEventListener('change', InitiateLabelsCheck);
-
-
-// [-------] Конец базовой организации модели [-------]
-
-// [-------] Функции обновления состояния камеры и инструментов управления [-------]
     
     // Функция обновления минимальной дистанции, в зависимости
     // от радиуса объекта

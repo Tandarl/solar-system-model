@@ -104,9 +104,17 @@
         </div>
     </main>
     <div id="side-panel__expand-button" class="expand-side-panel-button icon-button-desktop hidden"><img src="./assets/icons/arrows_icon.svg" alt="expand" class="expand-side-panel-icon"></div>
-    <div class="time-slider-container">
-        <range-slider min="0" max="4" step="1" value="0"></range-slider>
-        <output>стандартный темп</output>
+    <div class="controls-container">
+        <div class="time-slider-container">
+            <range-slider min="0" max="4" step="1" value="0"></range-slider>
+            <output>стандартный темп</output>
+        </div>
+        <div class="orbits-toggle-container" id="orbits-checkbox-container">
+            <input type="checkbox" class="checkbox_input" id="orbits_toggle" checked="true">
+            <label for="orbits_toggle" class="checkbox_label" id="orbits_icon">
+                <img class="collapse-panel-icon" src="./assets/icons/orbits_icon.svg" alt="orbits toggle">
+            </label>
+        </div>
     </div>
     <div class="top-right-menu">
         <img id="objects-list-panel__expand-button" class="top-right-menu__burger-menu icon-button-desktop" src="./assets/icons/burger-menu.svg" alt="objects list">

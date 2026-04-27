@@ -1,0 +1,155 @@
+.controls-container {
+    // border: 1px solid red;
+    position: fixed;
+    top: 1rem;
+    left: 50%;
+    translate: -50% 0;
+    height: 50px;
+    width: 30rem;
+    z-index: 10;
+
+   
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.time-slider-container {
+    // border: 1px solid aqua;
+
+    width: 20rem;
+
+    z-index: 10;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+}
+
+output {
+    font-family: "Exo 2", sans-serif;
+    font-size: 1.5rem;
+    color: white;
+}
+
+range-slider {
+  --track-size: 0.4rem;
+  --thumb-size: 1.4rem;
+
+  [data-track] {
+    background: #363636;
+  }
+
+  [data-track-fill] {
+    background: #535bf2;
+  }
+
+  [data-thumb] {
+    background: #535bf2;
+    border: 2px solid white;
+    transition: transform 200ms ease;
+    will-change: transform;
+
+    &:active {
+        box-shadow: none;
+        transform: scale(1.5);
+    }
+  }
+}
+
+range-slider:not([orientation="vertical"]) {
+  inline-size: 100%;
+}
+
+range-slider [data-track] {
+  color: black;
+}
+
+
+.orbits-toggle-container {
+    // border: 1px solid green;
+    column-gap: 0.7rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+    align-items: center;
+}
+
+.checkbox_input {
+    appearance: none;
+    -webkit-appearance: none;
+
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 2px solid white;
+    border-radius: 0.25rem;
+    background-color: transparent;
+    cursor: pointer;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    margin: 0;
+}
+
+.checkbox_input:checked {
+    background-color: #535bf2;
+}
+
+.checkbox-input:hover:not(:disabled) {
+    border-color: #0d6efd;
+}
+// range-slider [data-track-fill] {
+// }
+// range-slider [data-thumb] {
+// } 
+
+@media(max-width: $tablet-max-width ) and (orientation: portrait) {
+    .controls-container {
+    // border: 1px solid red;
+    position: fixed;
+    top: 1rem;
+    left: 40%;
+    // translate: 50% 0;
+    height: 50px;
+    width: 25rem;
+    z-index: 10;
+
+   
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    }
+
+    
+}
+
+@media(max-width: 430px ) and (orientation: portrait) {
+    .time-slider-container {
+        width: 15rem;
+    }
+}
+
+@media(max-width: $tablet-max-width ) and (orientation: landscape) {
+    .controls-container {
+    // border: 1px solid red;
+    position: fixed;
+    top: 1rem;
+    left: 50%;
+    // translate: 50% 0;
+    height: 50px;
+    width: 30rem;
+    z-index: 10;
+
+    column-gap: 3rem;
+
+   
+
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    }
+}
