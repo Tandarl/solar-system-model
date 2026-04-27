@@ -27,6 +27,10 @@ module.exports = (env) => {
                         "sass-loader",
                     ],
                 },
+                {
+                    test: /\.(woff|woff2|eot|ttf|otf)$/i,
+                    type: 'asset/resource',
+                },
             ]
         },
         entry: path.resolve(__dirname, 'source', 'js', 'index.js'),
