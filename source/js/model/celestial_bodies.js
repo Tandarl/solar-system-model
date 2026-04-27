@@ -426,7 +426,7 @@ class Planet extends CelestialBody {
 
             console.log("THIS IN EARTH", this);
             this.moons.push(new Moon(celestialBodiesData[4], this));
-            this.groups.meshMoonsGroup.add(this.moons[0].moonGroup);
+            this.groups.meshMoonsGroup.add(this.moons[0].GeneralGroup);
         }
 
         // MARS
@@ -445,8 +445,8 @@ class Planet extends CelestialBody {
             this.moons.push(new Moon(celestialBodiesData[6], this));
             this.moons.push(new Moon(celestialBodiesData[7], this));
 
-            this.groups.meshMoonsGroup.add(this.moons[0].moonGroup);
-            this.groups.meshMoonsGroup.add(this.moons[1].moonGroup);
+            this.groups.meshMoonsGroup.add(this.moons[0].GeneralGroup);
+            this.groups.meshMoonsGroup.add(this.moons[1].GeneralGroup);
         }
 
         if(obj.id >= 6 && obj.id < 10) {
@@ -649,6 +649,9 @@ class Moon extends CelestialBody {
             OrbitalVelocity: (obj.orbit_parameters["орбитальная скорость"].replace(/[^\d.-]/g, '')) / (obj.mediumDistanceFromParentObject),
         }
 
+        // Наклонение орбиты планеты относительно плоскости эклиптики
+        this.orbitInclination = degToRad(obj.orbitInclination);
+
         this.markerColor = moonsIOColors[this.id % 5];
         // По умолчанию лейбл и название скрыты
         this.textLabelElem.style.visibility = "hidden";
@@ -658,6 +661,7 @@ class Moon extends CelestialBody {
         
         this.moonGroup = new THREE.Group();
         this.axisTiltGroup = new THREE.Group();
+        this.GeneralGroup = new THREE.Group();
         
         
         
@@ -706,7 +710,10 @@ class Moon extends CelestialBody {
         this.moonGroup.add(this.axisTiltGroup);
         this.moonGroup.add(this.orbit);
         this.moonGroup.add(this.auxiliaryCubeMesh);
-        this.moonGroup.position.set(parent.distance, 0, 0);
+        this.GeneralGroup.add(this.moonGroup);
+        this.GeneralGroup.position.set(parent.distance, 0, 0);
+
+        this.GeneralGroup.rotation.z = this.orbitInclination;
 
         if(this.id == 31) {
             this.mesh.rotateY((2 * Math.PI) / 2);
