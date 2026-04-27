@@ -42,6 +42,10 @@ const SCALE_DIV = 10000;
     import rockyGasFragmentShader from "../../shaders/non_earth_planet/fragment.glsl";
     import rockyAtmosphereFragmentShader from  "../../shaders/non_earth_planet/rocky_atmosphere/fragment.glsl";
 
+    // Кольца Сатурна
+    import ringsVertexShader from "../../shaders/saturn_rings/vertex.glsl";
+    import ringsFragmentShader from "../../shaders/saturn_rings/fragment.glsl";
+
     // Спутники
     import MoonFragmentShader from "../../shaders/moon/fragment.glsl";
 
@@ -49,7 +53,7 @@ const SCALE_DIV = 10000;
     import testFragmentShader from "../../shaders/test/fragment.glsl";
     import testVertexShader from "../../shaders/test/vertex.glsl";
 import { RangeSliderElement } from 'range-slider-element';
-import { time } from 'three/tsl';
+import { texture, time } from 'three/tsl';
 
 
 // Скорость времени (количество секунд модели в секунду реального времени)
@@ -365,7 +369,7 @@ class Planet extends CelestialBody {
                 this.AtmosphereTwilightColor = '#948679';
             } else if (obj.id == 6) {
                 this.AtmosphereDayColor = '#feeacd';
-                this.AtmosphereTwilightColor = '#ff9e4f';
+                this.AtmosphereTwilightColor = '#feeacd';
             } else if (obj.id == 7) {
                 this.AtmosphereDayColor = '#afe4ea';
                 this.AtmosphereTwilightColor = '#80abb2';
@@ -497,17 +501,45 @@ class Planet extends CelestialBody {
 
             if (obj.id == 6) {
                 this.ringsUniforms = {
-                    uRingsTexture: 0
+                    uRingsTexture: 0,
+                    uRingsAlpha: 0
                 }
                 this.ringsUniforms.uRingsTexture = new THREE.Uniform(textureLoader.load(`./assets/textures/${obj.id}/rings_texture.jpg`));
+                this.ringsUniforms.uRingsAlpha = new THREE.Uniform(textureLoader.load(`./assets/textures/${obj.id}/rings_alpha.gif`) )
                 this.ringsUniforms.uRingsTexture.anisotropy = 8;
-                this.ringsMaterial = new THREE.MeshBasicMaterial({
-                    side: THREE.DoubleSide,
-                    transparent: true,
-                    map: textureLoader.load(`./assets/textures/${obj.id}/rings_texture.jpg`),
-                    // emissive: 0x141414,
-                    // emissiveIntensity: 1.5,  
+
+                // this.ringsGeometry = new THREE.RingGeometry(this.innerRadius, this.outerRadius, 128);
+                this.ringsGeometry = new THREE.RingGeometry(this.innerRadius, this.outerRadius, 128).rotateX(-Math.PI / 2);
+
+                this.uvAttr = this.ringsGeometry.attributes.uv;
+
+                for(let i = 0; i <= 1; i++) {
+                    this.u = i / 1;
+                    for(let j = 0; j <= 128; j++) {
+                        this.v = j / 128;
+                        this.idx = i *(129) + j;
+                        this.uvAttr.setXY(this.idx, this.u, this.v);
+                    }
+                }
+                this.uvAttr.needsUpdate = true;
+
+                this.ringsMaterial = new THREE.ShaderMaterial({
+                    vertexShader: ringsVertexShader,
+                    fragmentShader: ringsFragmentShader,
+                    uniforms: this.ringsUniforms,
+                    transparent: true
                 });
+
+                this.ringUpper = new THREE.Mesh(this.ringsGeometry, this.ringsMaterial);
+                this.ringLower = new THREE.Mesh(this.ringsGeometry, this.ringsMaterial).rotateX(Math.PI);
+
+                this.ringUpper.layers.enable(0);
+                this.ringUpper.layers.enable(1);
+                this.ringLower.layers.enable(0);
+                this.ringLower.layers.enable(1);
+
+                this.groups.axisTiltGroup.add(this.ringUpper);
+                this.groups.axisTiltGroup.add(this.ringLower);
 
                 this.moons.push(new Moon(celestialBodiesData[14], this));
                 this.moons.push(new Moon(celestialBodiesData[15], this));
@@ -516,15 +548,17 @@ class Planet extends CelestialBody {
                 this.moons.push(new Moon(celestialBodiesData[18], this));
             }
 
-            this.ringsMaterial.map.anisotropy = 8;
-
-            this.ringsMesh = new THREE.Mesh(this.ringsGeometry, this.ringsMaterial);
-            this.ringsMesh.rotation.x = (Math.PI / 2);
-            
-            this.groups.axisTiltGroup.add(this.ringsMesh);
-
-            this.ringsMesh.layers.enable(0);
-            this.ringsMesh.layers.enable(1);
+            if(this.id != 6) {
+                this.ringsMaterial.map.anisotropy = 8;
+    
+                this.ringsMesh = new THREE.Mesh(this.ringsGeometry, this.ringsMaterial);
+                this.ringsMesh.rotation.x = (Math.PI / 2);
+                
+                this.groups.axisTiltGroup.add(this.ringsMesh);
+    
+                this.ringsMesh.layers.enable(0);
+                this.ringsMesh.layers.enable(1);
+            }
         }
 
         if(obj.id == 7) {
