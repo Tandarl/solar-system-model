@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import {DBAPI} from '../database/data_base_api';
 import { MathUtils } from 'three';
-import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
+// import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
 import {CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 import { changeFocusedObject, unloadPlanetGroup} from './model_basic';
 import { degToRad } from 'three/src/math/MathUtils.js';
@@ -52,8 +52,22 @@ const SCALE_DIV = 10000;
     // Тестовые шейдеры
     import testFragmentShader from "../../shaders/test/fragment.glsl";
     import testVertexShader from "../../shaders/test/vertex.glsl";
-import { RangeSliderElement } from 'range-slider-element';
-import { texture, time } from 'three/tsl';
+
+
+const loadingManager = new THREE.LoadingManager();
+
+const progressBar = document.getElementById("progress-bar");
+
+// Реализация загрузочного экрана
+loadingManager.onProgress = function(url, loaded, total) {
+    progressBar.value = (loaded / total) * 100;
+}
+
+const loadingScreen = document.getElementById("loading-screen");
+
+loadingManager.onLoad = function() {
+    loadingScreen.style.display = 'none';
+}
 
 
 // Скорость времени (количество секунд модели в секунду реального времени)
@@ -67,7 +81,7 @@ const modelOrbitsAndIconsColors = ["#f6e324", "#c49227", "#7c28ce", "#3156ea", "
 const moonsIOColors = ["#c49227", "#c7620e", "#ef9764", "#f1d168", "#6661e7"];
 
 // Инициализация загрузчика текстур
-const textureLoader = new THREE.TextureLoader();
+const textureLoader = new THREE.TextureLoader(loadingManager);
 
 const timeController = {
     sliderElement: 0,
@@ -928,7 +942,7 @@ let focusObject = celestialBodiesMeshesList[0];
 timeController.init();
 
 
-export {celestialBodiesMeshesList, focusObject, uniformData};
+export {celestialBodiesMeshesList, focusObject, uniformData, loadingManager};
 
 
 /* 

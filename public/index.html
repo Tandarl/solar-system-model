@@ -16,6 +16,11 @@
     <title>Модель Солнечной системы</title>
 </head>
 <body>
+    <div class="loading-screen" id="loading-screen">
+        <label class="loading-label" for="progress-bar">Загрузка...</label>
+        <progress class="loading-progress-bar" id="progress-bar" value="0" max="100"></progress>
+        <p class="waiting-message">Это может занять некоторое время</p>
+    </div>
     <main id="side-panel" class="side-panel">
         <div class="side-panel__collapse-button-container">
             <button id="side-panel__collapse-button" class="side-panel__panel-collapse-button icon-button-desktop"><img class="collapse-panel-icon" src="./assets/icons/arrows_icon.svg" alt="collapse"></button>

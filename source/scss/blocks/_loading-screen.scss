@@ -1,0 +1,60 @@
+.loading-screen {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.8);
+
+    z-index: 50;
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    color: white;
+    font-family: "Exo 2", sans-serif;
+}
+
+.loading-progress-bar {
+    width: 33%;
+    margin-top: 0.5%;
+    height: 2%;
+
+    -webkit-appearance: none; /* Сброс дефолтных стилей для Хрома и Сафари */
+    -moz-appearance: none; /* Сброс дефолтных стилей для Firefox */
+    appearance: none;
+
+    // border: 1px solid white;
+    border-radius: 10px;
+
+    &::-webkit-progress-bar {
+        background-color: #464646;
+        border-radius: 10px;
+    }
+
+    /* 2. Progress fill for Chrome/Safari/Edge */
+    &::-webkit-progress-value {
+        background-color: #535bf2;
+        border-radius: 10px;
+    }
+
+    /* 3. Progress fill for Firefox */
+    &::-moz-progress-bar {
+        background-color: #535bf2;
+        border-radius: 10px;
+    }
+}
+
+.loading-label {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.waiting-message {
+    margin-top: 1%;
+    font-size: 1rem;
+    font-weight: normal;
+}

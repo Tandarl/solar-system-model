@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 import Stats from 'three/addons/libs/stats.module.js';
-import { celestialBodiesMeshesList, focusObject, uniformData } from "./celestial_bodies";
+import { celestialBodiesMeshesList, focusObject, uniformData, loadingManager } from "./celestial_bodies";
 import { SidePanel } from "../ui/side_panel";
 
 
@@ -42,7 +42,7 @@ stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
 // [-------] Инструменты для разработки [-------]
 
 // Установка снимка млечного пути задним фоном
-scene.background = new THREE.CubeTextureLoader()
+scene.background = new THREE.CubeTextureLoader(loadingManager)
     .setPath("./assets/textures/milky_way/")
     .load([
         'px.png',
