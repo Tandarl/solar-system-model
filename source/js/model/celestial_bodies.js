@@ -304,6 +304,9 @@ class Planet extends CelestialBody {
             RotationAroundAxisVelocity: ((obj.body_parameters["скорость вращения вокруг своей оси"].replace(/[^\d.-]/g, '')) * SCALE_DIV) / (obj.radius * 1000 * SCALE_DIV),
         }
 
+        // Наклонение орбиты планеты относительно плоскости эклиптики
+        this.orbitInclination = degToRad(obj.orbitInclination);
+
         // this.geometry = new THREE.SphereGeometry(obj.radius / SCALE_DIV, 64, 25);
         this.geometry = new THREE.SphereGeometry(obj.radius / SCALE_DIV, 64, 64);
         // this.geometry = new THREE.IcosahedronGeometry(obj.radius / SCALE_DIV, 18);
@@ -319,7 +322,6 @@ class Planet extends CelestialBody {
         this.distance = obj.mediumDistanceFromParentObject / SCALE_DIV;
 
         this.groups = {
-            GeneralGroup: new THREE.Group(),
             axisTiltGroup: new THREE.Group(),
             subsidiaryGroup: new THREE.Group(),
             meshMoonsGroup: new THREE.Group(),
@@ -535,9 +537,7 @@ class Planet extends CelestialBody {
             this.groups.axisTiltGroup.rotation.z = degToRad(obj.tilt);
         }
         
-        // Центр группы расположен в точке начала координат, что упрощает реализацию вращения планеты вокруг Солнца
-        this.groups.GeneralGroup.position.set(0, 0, 0);
-
+        // Центр групп расположен в точке начала координат, что упрощает реализацию вращения планеты вокруг Солнца
         this.groups.meshMoonsGrandGroup.position.set(0, 0, 0);
         this.groups.subsidiaryGrandGroup.position.set(0, 0, 0);
 
@@ -551,14 +551,8 @@ class Planet extends CelestialBody {
         this.groups.subsidiaryGroup.add(this.orbit);
         this.groups.subsidiaryGroup.add(this.auxiliaryCubeMesh);
 
-        if (this.id == 1) {
-            console.log("MERCURY");
-            this.groups.subsidiaryGrandGroup.rotation.z = degToRad(45);
-            this.groups.meshMoonsGrandGroup.rotation.z = degToRad(45);
-        }
-
-        // this.groups.GeneralGroup.add(this.groups.meshMoonsGroup);
-        // this.groups.GeneralGroup.add(this.groups.subsidiaryGroup);
+        this.groups.subsidiaryGrandGroup.rotation.z = this.orbitInclination;
+        this.groups.meshMoonsGrandGroup.rotation.z = this.orbitInclination;
     }
 
     UpdatePosition(delta) {

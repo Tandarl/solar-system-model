@@ -243,7 +243,7 @@ scene.background = new THREE.CubeTextureLoader()
         if(focusObject.id < 10 && focusObject.id != 0) {
             scene.add(celestialBodiesMeshesList[focusObject.id].groups.meshMoonsGrandGroup);
         } else if(focusObject.id > 10) {
-            scene.add(celestialBodiesMeshesList[Number(focusObject.id.toString()[0])].groups.meshMoonsGroup);
+            scene.add(celestialBodiesMeshesList[Number(focusObject.id.toString()[0])].groups.meshMoonsGrandGroup);
         }
         
         focusObject.auxiliaryCubeMesh.add(camera);
