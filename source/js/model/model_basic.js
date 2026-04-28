@@ -88,7 +88,7 @@ scene.background = new THREE.CubeTextureLoader(loadingManager)
 // [-------] Работа с отображением лейблов у объектов [-------]
     // Инициализация и настройка камеры
     const camera = new THREE.PerspectiveCamera(
-        70,
+        35,
         window.innerWidth / window.innerHeight,
         0.0001,
         4.5e6
@@ -111,11 +111,11 @@ scene.background = new THREE.CubeTextureLoader(loadingManager)
     const fakeCamera = camera.clone();
     fakeCamera.rotation.set(0, 0, 0);
     const controls = new OrbitControls(fakeCamera, canvas);
-    controls.maxDistance = CAMERA_MAX_DISTANCE;
+    controls.maxDistance = CAMERA_MAX_DISTANCE * 2;
     controls.enablePan = ENABLE_PAN; // Отключение возможности изменения центра вращения камеры "перетаскиванием"
     controls.enableDamping = ENABLE_DAMPING; // Эффект "инерции" при вращении камеры. Дает большую иммерсивность
     controls.zoomSpeed = 8;
-    controls.minDistance = (focusObject.radius / SCALE_DIVIDER) * 1.2;
+    controls.minDistance = (focusObject.radius / SCALE_DIVIDER) * 1.8;
 
     fakeCamera.layers.set(0);
     // fakeCamera.layers.enable(1);
@@ -168,7 +168,7 @@ scene.background = new THREE.CubeTextureLoader(loadingManager)
         },
 
         choosePlanetsAction() {
-            if (this.distance > 185_000) { this.hideLabels(1, 4, false) }
+            if (this.distance > 277_500) { this.hideLabels(1, 4, false) }
             else if (this.distance > 1000 && this.distance < 10_000) { this.showLabels(0, 4) }
             else if (this.distance <= 1200) { this.hideLabels(0, 8, true) }
             else if (this.distance > 10_000) { this.showLabels(0, 8) }
@@ -180,7 +180,7 @@ scene.background = new THREE.CubeTextureLoader(loadingManager)
             if (focusObject.id >= 3) {
                 if (focusObject.id < 10) {
                     this.planetSystemRadius = focusObject.farthestMoonOrbitRadius;
-                    if (this.distance > this.planetSystemRadius * 10 || this.distance < controls.minDistance * 1.2) {
+                    if (this.distance > this.planetSystemRadius * 10 || this.distance < controls.minDistance * 1.8) {
                         this.hideMoonsLabels(0, focusObject.moons.length - 1, focusObject);
                     } else {
                         this.showMoonsLabels(0, focusObject.moons.length - 1, focusObject);
@@ -242,9 +242,9 @@ scene.background = new THREE.CubeTextureLoader(loadingManager)
     function updateControlsParams() {
         // console.log("NEW FOCUS AND IT'S RADIUS", focusObject, focusObject.radius);
         if(focusObject.id == 0) {
-            controls.minDistance = (focusObject.radius / SCALE_DIVIDER) * 1.2;
+            controls.minDistance = (focusObject.radius / SCALE_DIVIDER) * 1.5;
         } else {
-            controls.minDistance = (focusObject.radius / SCALE_DIVIDER) * 2;
+            controls.minDistance = (focusObject.radius / SCALE_DIVIDER) * 3;
         }
         // console.log("NEW MIN DIST", controls.minDistance);
     }
@@ -291,7 +291,7 @@ scene.background = new THREE.CubeTextureLoader(loadingManager)
         } else if(focusObject.id >= 1 && focusObject.id < 10) {
             fakeCamera.position.z = controls.minDistance;
         } else {
-            fakeCamera.position.x = controls.minDistance * 1.5;
+            fakeCamera.position.x = controls.minDistance * 3.5;
             fakeCamera.position.y = 0;
             fakeCamera.position.z = controls.minDistance;
         }

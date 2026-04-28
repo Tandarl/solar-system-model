@@ -271,7 +271,11 @@ class Star extends CelestialBody {
 
         // Вспомогательный объект, к которому будет прикреплена камера
         this.auxiliaryCubeGeometry = new THREE.BoxGeometry(0.001, 0.001, 0.001);
-        this.auxiliaryCubeMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+        this.auxiliaryCubeMaterial = new THREE.MeshBasicMaterial({ 
+            color: 0xffc108,
+            transparent: true,
+            opacity: 0.0
+        });
         this.auxiliaryCubeMesh = new THREE.Mesh(this.auxiliaryCubeGeometry, this.auxiliaryCubeMaterial);
         this.auxiliaryCubeMesh.position.set(0, 0, 0);
 
@@ -618,7 +622,11 @@ class Planet extends CelestialBody {
         // Вспомогательный объект, к которому будет прикреплена камера
         this.auxiliaryCubeSize = (this.radius / SCALE_DIV) / 100;
         this.auxiliaryCubeGeometry = new THREE.BoxGeometry(this.auxiliaryCubeSize, this.auxiliaryCubeSize, this.auxiliaryCubeSize);
-        this.auxiliaryCubeMaterial = new THREE.MeshBasicMaterial({color: 0xff0000});
+        this.auxiliaryCubeMaterial = new THREE.MeshBasicMaterial({
+            color: 0xffc108,
+            transparent: true,
+            opacity: 0.0
+        });
         this.auxiliaryCubeMesh = new THREE.Mesh(this.auxiliaryCubeGeometry, this.auxiliaryCubeMaterial);
         this.auxiliaryCubeMesh.position.set(this.distance, 0, 0);
 
@@ -812,7 +820,11 @@ class Moon extends CelestialBody {
         this.auxiliaryCubeSize = (this.radius / SCALE_DIV) / 10;
         this.auxiliaryCubeGeometry = new THREE.BoxGeometry(this.auxiliaryCubeSize, this.auxiliaryCubeSize, this.auxiliaryCubeSize);
 
-        this.auxiliaryCubeMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        this.auxiliaryCubeMaterial = new THREE.MeshBasicMaterial({
+            color: 0xffc108,
+            transparent: true,
+            opacity: 0.0
+        });
         this.auxiliaryCubeMesh = new THREE.Mesh(this.auxiliaryCubeGeometry, this.auxiliaryCubeMaterial);
         this.mesh.position.set(0, 0, 0);
         this.axisTiltGroup.add(this.mesh);
