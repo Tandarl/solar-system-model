@@ -35,7 +35,7 @@ module.exports = (env) => {
         },
         entry: path.resolve(__dirname, 'source', 'js', 'index.js'),
         output: {
-            path: path.resolve(__dirname, 'build'),
+            path: path.resolve(__dirname, 'docs'),
             filename: 'bundle.[contenthash].js',
             clean: true
         },
