@@ -353,8 +353,16 @@
 // Tablet
 @media(max-width: $tablet-max-width ) {
     .side-panel {
-        width: calc(100vw - 30px);
+        width: calc(100vw - 20px);
         height: 38vh;
+    }
+
+    .side-panel__tabs {
+        margin-top: 10px;
+    }
+
+    #side-panel__collapse-button {
+        z-index: 20;
     }
 
     .side-panel__tabs .side-panel__tab-label {
@@ -426,8 +434,15 @@
 // Mobile
 @media (max-width: $mobile-max-width) {
     .side-panel {
-        padding: 15px;
+        padding-left: 15px;
+        padding-right: 15px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+
+        height: 45vh;
     }
+
+    
 
     .side-panel__object-name {
         font-size: 34px;
