@@ -3,6 +3,7 @@
 # Build directory as it contains minimized code
 build/
 .vscode/
+docs/
 source/shaders/test
 
 # Logs

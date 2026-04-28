@@ -47,7 +47,7 @@ module.exports = (env) => {
                 patterns: [
                     {
                         from: path.resolve(__dirname, "source/assets"),
-                        to: path.resolve(__dirname, "build/assets")
+                        to: path.resolve(__dirname, "docs/assets")
                     }
                 ]
             }),
