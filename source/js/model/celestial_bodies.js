@@ -49,10 +49,6 @@ const SCALE_DIV = 10000;
     // Спутники
     import MoonFragmentShader from "../../shaders/moon/fragment.glsl";
 
-    // Тестовые шейдеры
-    import testFragmentShader from "../../shaders/test/fragment.glsl";
-    import testVertexShader from "../../shaders/test/vertex.glsl";
-
 
 const loadingManager = new THREE.LoadingManager();
 
