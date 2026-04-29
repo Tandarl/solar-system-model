@@ -11,11 +11,11 @@ void main(){
     vec3 normal = normalize(vNormal);
     vec3 color = vec3(0.);
 
-    color += vec3(1.0, 0.96, 0.76);
+    color += vec3(1.0, 0.8784, 0.3294);
 
     // Alpha
     float edgeAlpha = dot(viewDirection, normal);
-    edgeAlpha = smoothstep(0.4, 0.95, edgeAlpha);
+    edgeAlpha = smoothstep(0.7, 0.95, edgeAlpha);
 
 
     // Final color

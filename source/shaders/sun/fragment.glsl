@@ -10,7 +10,7 @@ varying vec3 vPosition;
 float CalcFresnel() {
     vec3 viewDirection = normalize(vPosition - cameraPosition);
     float fresnel = dot(viewDirection, normalize(vNormal)) + 1.;
-    return pow(fresnel, 3.);
+    return pow(fresnel, 2.);
 }
 
 void main(){

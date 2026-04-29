@@ -267,7 +267,8 @@ class Star extends CelestialBody {
 
 
         this.atmosphere = new THREE.Mesh(this.geometry, this.atmosphereMaterial);
-        this.atmosphere.scale.set(1.5, 1.5, 1.5);
+        // this.atmosphere.scale.set(1.5, 1.5, 1.5);
+        this.atmosphere.scale.set(2, 2, 2);
 
 
         // Так как Солнце изначально находится в фокусе, его маркер и лейбл скрыты по умолчанию
