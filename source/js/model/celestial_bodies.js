@@ -33,6 +33,8 @@ const SCALE_DIV = 10000;
 // {---} Фрагментарные шейдеры (свои) для каждого типа объектов {---}
     // Солнце
     import sunFragmentShader from "../../shaders/sun/fragment.glsl";
+    // Атмосфера Солнца
+    import sunAtmosphereFragmentShader from "../../shaders/sun/atmosphere/fragment.glsl";
 
     // Земля
     import earthFragmentShader from "../../shaders/earth/fragment.glsl";
@@ -92,31 +94,6 @@ const timeController = {
         this.outputElement.value = "стандартный темп";
         
         console.log("OUTPUT ELEM", this.outputElement)
-        // this.sliderElement.addEventListener("input", (event) => {
-        //     this.sliderValue = event.target.value;
-            
-        //     if(this.sliderValue == 0) {
-        //         this.outputElement.value = "нормальный темп";
-        //         timeSpeed = 1;
-
-        //     } else if(this.sliderValue == 1) {
-        //         this.outputElement.value = "1 час/сек р.в.";
-        //         timeSpeed = 3600;
-
-        //     } else if(this.sliderValue == 2) {
-        //         this.outputElement.value = "1 день/сек р.в.";
-        //         timeSpeed = 86400;
-
-        //     }else if(this.sliderValue == 3) {
-        //         this.outputElement.value = "1 мес/сек р.в.";
-        //         timeSpeed = 2592000;
-
-        //     } else if(this.sliderValue == 4) {
-        //         this.outputElement.value = "1 год/сек р.в.";
-        //         timeSpeed = 31557600;
-
-        //     }
-        // });
 
         this.sliderElement.addEventListener("change", (event) => {
             this.sliderValue = event.target.value;
@@ -145,11 +122,7 @@ const timeController = {
         });
     },
     
-    // reflectValue: (event) => (
-    //     this.outputElement.value = event.target.value
-    // ),
     reflectValue() {
-        // this.outputElement.value = this.sliderElement.value;
         console.log("REFLECT", this.outputElement);
         console.log(this.sliderElement.value);
     }
@@ -245,19 +218,24 @@ class Star extends CelestialBody {
     constructor(obj) {
         super(obj);
 
-        this.geometry = new THREE.IcosahedronGeometry(obj.radius / SCALE_DIV, 14);
+        this.geometry = new THREE.SphereGeometry(obj.radius / SCALE_DIV, 64, 64);
+        this.atmosphereGeometry = new THREE.IcosahedronGeometry((obj.radius / SCALE_DIV), 10);
 
         this.SpeedParams = {
             RotationAroundAxisVelocity: ((obj.body_parameters["скорость вращения вокруг своей оси"].replace(/[^\d.-]/g, ''))) / (obj.radius * SCALE_DIV),
         }
 
+        this.starUniforms = THREE.UniformsUtils.clone(uniformData);
+        this.starUniforms.uSurfaceTexture = new THREE.Uniform(textureLoader.load(`./assets/textures/0/texture.jpg`));
+
         this.material = new THREE.ShaderMaterial({
-            vertexShader:  generalBodyVertexShader,
+            vertexShader: generalBodyVertexShader,
             fragmentShader: sunFragmentShader,
-            uniforms: uniformData,
-            // wireframe: true,
-            // map: textureLoader.load(`./assets/textures/${obj.id}/texture.jpg`),
-        });
+            uniforms: this.starUniforms,
+            // transparent: false,
+            // depthWrite: false,
+            // blending: THREE.MultiplyBlending
+        })
 
         console.log(this.geometry);
 
@@ -265,6 +243,33 @@ class Star extends CelestialBody {
         this.mesh.rotation.z = MathUtils.degToRad(obj.tilt);
 
         this.mesh.position.set(0, 0, 0);
+
+        this.sunAtmosphereColor = "#f8e8b3";
+        this.starUniforms.uSunAtmosphereColor = new THREE.Uniform(new THREE.Color(this.sunAtmosphereColor));
+        // Атмосфера
+        // this.atmosphereMaterial = new THREE.ShaderMaterial({
+        //     vertexShader: generalAtmosphereVertexShader,
+        //     fragmentShader: sunAtmosphereFragmentShader,
+        //     uniforms: this.starUniforms,
+        //     side: THREE.BackSide,
+        //     transparent: true,
+        //     // depthWrite: false,
+        //     // blending: THREE.AdditiveBlending
+        // });
+        this.atmosphereMaterial = new THREE.ShaderMaterial({
+            side: THREE.BackSide,
+            transparent: true,
+            vertexShader: generalBodyVertexShader,
+            fragmentShader: sunAtmosphereFragmentShader,
+            uniforms: this.starUniforms,
+            depthWrite: false
+        });
+
+
+        this.atmosphere = new THREE.Mesh(this.geometry, this.atmosphereMaterial);
+        this.atmosphere.scale.set(1.5, 1.5, 1.5);
+
+
         // Так как Солнце изначально находится в фокусе, его маркер и лейбл скрыты по умолчанию
         this.textLabelElem.style.visibility = "hidden";
         this.markerLabelELem.style.visibility = "hidden";
@@ -289,15 +294,17 @@ class Star extends CelestialBody {
         
         this.starGroup = new THREE.Group();
         this.starGroup.position.set(0, 0, 0);
-
+        
+        this.starGroup.add(this.atmosphere);
         this.starGroup.add(this.mesh);
         this.starGroup.add(this.auxiliaryCubeMesh);
 
         this.mesh.layers.enable(0);
         this.mesh.layers.enable(1); 
-
         this.auxiliaryCubeMesh.layers.enable(0);
         this.auxiliaryCubeMesh.layers.enable(1);
+        this.atmosphere.layers.enable(0);
+        this.atmosphere.layers.enable(1);
     }
 
     Update(delta) {
@@ -321,7 +328,7 @@ class Star extends CelestialBody {
         }
     }
     UpdateRotation(delta) {
-        this.mesh.rotation.y += this.SpeedParams.RotationAroundAxisVelocity * delta;
+        this.mesh.rotation.y += this.SpeedParams.RotationAroundAxisVelocity * delta * timeSpeed;
     }
 }
 
@@ -453,10 +460,6 @@ class Planet extends CelestialBody {
 
 
             this.groups.axisTiltGroup.add(this.atmosphere);
-            
-            // this.groups.subsidiaryGroup.rotation.y = Math.PI;
-            // this.groups.meshMoonsGroup.rotation.y = Math.PI;
-            // this.groups.axisTiltGroup.rotation.y = Math.PI;
 
             console.log("EARTH POSITION", this.mesh.position);
 

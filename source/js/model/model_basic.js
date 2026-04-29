@@ -90,7 +90,7 @@ scene.background = new THREE.CubeTextureLoader(loadingManager)
     const camera = new THREE.PerspectiveCamera(
         35,
         window.innerWidth / window.innerHeight,
-        0.0001,
+        0.01,
         4.5e6
     );
 
@@ -115,7 +115,7 @@ scene.background = new THREE.CubeTextureLoader(loadingManager)
     controls.enablePan = ENABLE_PAN; // Отключение возможности изменения центра вращения камеры "перетаскиванием"
     controls.enableDamping = ENABLE_DAMPING; // Эффект "инерции" при вращении камеры. Дает большую иммерсивность
     controls.zoomSpeed = 8;
-    controls.minDistance = (focusObject.radius / SCALE_DIVIDER) * 1.8;
+    controls.minDistance = (focusObject.radius / SCALE_DIVIDER) * 5;
 
     fakeCamera.layers.set(0);
     // fakeCamera.layers.enable(1);
@@ -242,7 +242,7 @@ scene.background = new THREE.CubeTextureLoader(loadingManager)
     function updateControlsParams() {
         // console.log("NEW FOCUS AND IT'S RADIUS", focusObject, focusObject.radius);
         if(focusObject.id == 0) {
-            controls.minDistance = (focusObject.radius / SCALE_DIVIDER) * 1.5;
+            controls.minDistance = (focusObject.radius / SCALE_DIVIDER) * 5;
         } else {
             controls.minDistance = (focusObject.radius / SCALE_DIVIDER) * 3;
         }
@@ -287,10 +287,23 @@ scene.background = new THREE.CubeTextureLoader(loadingManager)
         fakeCamera.position.x = -1;
         fakeCamera.position.y = 0;
         if(focusObject.id == 0) {
+            camera.near = 0.009;
+            fakeCamera.near = 0.009;
+            camera.updateProjectionMatrix();
+            fakeCamera.updateProjectionMatrix();
+            // fakeCamera.copy(camera);
             fakeCamera.position.z = (focusObject.radius / SCALE_DIVIDER) * 2;
         } else if(focusObject.id >= 1 && focusObject.id < 10) {
+            camera.near = 0.009;
+            fakeCamera.near = 0.009;
+            camera.updateProjectionMatrix();
+            fakeCamera.updateProjectionMatrix();
             fakeCamera.position.z = controls.minDistance;
         } else {
+            camera.near = 0.001;
+            fakeCamera.near = 0.001;
+            camera.updateProjectionMatrix();
+            fakeCamera.updateProjectionMatrix();
             fakeCamera.position.x = controls.minDistance * 3.5;
             fakeCamera.position.y = 0;
             fakeCamera.position.z = controls.minDistance;
