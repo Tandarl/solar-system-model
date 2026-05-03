@@ -368,7 +368,6 @@ class Planet extends CelestialBody {
             subsidiaryGrandGroup: new THREE.Group(),
             meshMoonsGrandGroup: new THREE.Group(),
         }
-        // subsidiaryGroup это отдельная группа для орбиты и вспомогательного объекта, т.к орбита отображается всегда, и к вспомогательному объекту прикреплены лейбл и метка
 
 
         if(obj.id < 10 && obj.id != 3) {

@@ -74,7 +74,7 @@ scene.background = new THREE.CubeTextureLoader(loadingManager)
     const camera = new THREE.PerspectiveCamera(
         35,
         window.innerWidth / window.innerHeight,
-        0.01,
+        0.09,
         4.5e6
     );
 
@@ -271,15 +271,15 @@ scene.background = new THREE.CubeTextureLoader(loadingManager)
         fakeCamera.position.x = -1;
         fakeCamera.position.y = 0;
         if(focusObject.id == 0) {
-            camera.near = 0.009;
-            fakeCamera.near = 0.009;
+            camera.near = 0.09;
+            fakeCamera.near = 0.09;
             camera.updateProjectionMatrix();
             fakeCamera.updateProjectionMatrix();
             // fakeCamera.copy(camera);
             fakeCamera.position.z = (focusObject.radius / SCALE_DIVIDER) * 2;
         } else if(focusObject.id >= 1 && focusObject.id < 10) {
-            camera.near = 0.009;
-            fakeCamera.near = 0.009;
+            camera.near = 0.045;
+            fakeCamera.near = 0.045;
             camera.updateProjectionMatrix();
             fakeCamera.updateProjectionMatrix();
             fakeCamera.position.z = controls.minDistance;
