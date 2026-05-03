@@ -341,7 +341,7 @@ class Planet extends CelestialBody {
         this.moons = [];
 
         this.SpeedParams = {
-            RotationAroundAxisVelocity: ((obj.body_parameters["скорость вращения вокруг своей оси"].replace(/[^\d.-]/g, '')) * SCALE_DIV) / (obj.radius * 1000 * SCALE_DIV),
+            RotationAroundAxisVelocity: ((obj.body_parameters["скорость вращения вокруг своей оси"].replace(/[^\d.-]/g, ''))) / (obj.radius * 1000 ),
         }
 
         // Наклонение орбиты планеты относительно плоскости эклиптики

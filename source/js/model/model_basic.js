@@ -25,22 +25,6 @@ const canvas = document.querySelector('canvas.three-js');
 // Инициализация и настройка сцены
 const scene = new THREE.Scene();
 
-// [-------] Инструменты для разработки [-------]
-
-// Отслеживание производительности
-var stats = new Stats();
-stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom 
-document.body.appendChild(stats.dom);
-
-// const gridHelper = new THREE.GridHelper(1e5, 20);
-// scene.add(gridHelper);
-
-// const axesHelper = new THREE.AxesHelper(1e5 / 2);
-// axesHelper.setColors(0xff2d00, 0x0500ff, 0x18ff00);
-// scene.add(axesHelper);
-
-// [-------] Инструменты для разработки [-------]
-
 // Установка снимка млечного пути задним фоном
 scene.background = new THREE.CubeTextureLoader(loadingManager)
     .setPath("./assets/textures/milky_way/")
@@ -180,14 +164,14 @@ scene.background = new THREE.CubeTextureLoader(loadingManager)
             if (focusObject.id >= 3) {
                 if (focusObject.id < 10) {
                     this.planetSystemRadius = focusObject.farthestMoonOrbitRadius;
-                    if (this.distance > this.planetSystemRadius * 10 || this.distance < controls.minDistance * 1.8) {
+                    if (this.distance > this.planetSystemRadius * 10 || this.distance < controls.minDistance * 2.5) {
                         this.hideMoonsLabels(0, focusObject.moons.length - 1, focusObject);
                     } else {
                         this.showMoonsLabels(0, focusObject.moons.length - 1, focusObject);
                     }
                 } else {
                     this.planetSystemRadius = focusObject.parent.farthestMoonOrbitRadius;
-                    if (this.distance > this.planetSystemRadius * 50) {
+                    if (this.distance > this.planetSystemRadius * 50 || this.distance < (controls.minDistance) * 3) {
                         this.hideMoonsLabels(0, focusObject.parent.moons.length - 1, focusObject.parent);
                     } else {
                         this.showMoonsLabels(0, focusObject.parent.moons.length - 1, focusObject.parent);
@@ -342,8 +326,6 @@ uniformData.u_time.value = clock.getElapsed();
 // [-------] Цикл renderLoop [-------]
 
     const renderLoop = () => {
-        // !!! Удалить stats.begin()  и stats.end() на проде
-        stats.begin();
         clock.update();
 
         // Следующие операции со временем нужны для обеспечения независимости рендеринга от частоты кадров
@@ -366,7 +348,6 @@ uniformData.u_time.value = clock.getElapsed();
         labelRenderer.render(scene, camera);
 
         uniformData.u_time.value = clock.getElapsed();
-        stats.end();
         // Функция вызывает сама себя, причем при помощи метода requestAnimationFrame
         // достигается баланс между приемлемой частотой кадров и нагрузкой на систему
         window.requestAnimationFrame(renderLoop);
