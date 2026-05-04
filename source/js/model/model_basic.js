@@ -49,6 +49,19 @@ scene.background = new THREE.CubeTextureLoader(loadingManager)
     // Установка размера для потока вывода изображения
     renderer.setSize(window.innerWidth, window.innerHeight);
 
+// [----] Определение типа устройства пользователя [----]
+const userDevice = {
+    isMobile: false,
+
+    getDeviceType() {
+        console.log("DEVICE CHECK");
+        if (window.matchMedia('(pointer: coarse)').matches && window.matchMedia('(max-width: 1024px)').matches) {
+            console.log("THIS IS MOBILE");
+            this.isMobile = true;
+        }
+    }
+}
+
     // Добавление объектов на сцену
     function init() {
         scene.add(celestialBodiesMeshesList[0].starGroup);
@@ -57,8 +70,9 @@ scene.background = new THREE.CubeTextureLoader(loadingManager)
         }
         LabelManager.checkBoxState = true;
         LabelManager.bindCheckboxOnclickTrigger();
+        userDevice.getDeviceType();
     }
-// [-------] Работа с отображением лейблов у объектов [-------]
+
     // Инициализация и настройка камеры
     const camera = new THREE.PerspectiveCamera(
         35,
@@ -83,7 +97,11 @@ scene.background = new THREE.CubeTextureLoader(loadingManager)
     controls.maxDistance = CAMERA_MAX_DISTANCE * 2;
     controls.enablePan = ENABLE_PAN; // Отключение возможности изменения центра вращения камеры "перетаскиванием"
     controls.enableDamping = ENABLE_DAMPING; // Эффект "инерции" при вращении камеры. Дает большую иммерсивность
-    controls.zoomSpeed = 8;
+    if(userDevice.isMobile) {
+        controls.zoomSpeed = 4;
+    } else {
+        controls.zoomSpeed = 8;
+    }
     controls.minDistance = (focusObject.radius / SCALE_DIVIDER) * 5;
 
     fakeCamera.layers.set(0);
@@ -93,13 +111,13 @@ scene.background = new THREE.CubeTextureLoader(loadingManager)
 
 // [-------] Конец базовой организации модели [-------]
 
-// [-------] Функции обновления состояния камеры и инструментов управления [-------]
+
 
 // [-------] Работа с отображением лейблов у объектов [-------]
-    const LabelManager = {
-        previousDistance: 0,
-        distance: 0,
-        planetSystemRadius: 0,
+const LabelManager = {
+    previousDistance: 0,
+    distance: 0,
+    planetSystemRadius: 0,
 
         hideLabels(from_ID, upTo_ID, hideMarkers) {
             for (let i = from_ID; i <= upTo_ID; i++) {
@@ -201,6 +219,7 @@ scene.background = new THREE.CubeTextureLoader(loadingManager)
 
     }
     
+// [-------] Функции обновления состояния камеры и инструментов управления [-------]
     // Функция обновления минимальной дистанции, в зависимости от радиуса объекта
     function updateControlsParams() {
         if(focusObject.id == 0) {
@@ -245,7 +264,7 @@ scene.background = new THREE.CubeTextureLoader(loadingManager)
         // controls.reset();
         
         fakeCamera.position.x = -1;
-        fakeCamera.position.y = 0;
+        fakeCamera.position.y = 0.5;
         if(focusObject.id == 0) {
             camera.near = 0.09;
             fakeCamera.near = 0.09;
@@ -258,7 +277,7 @@ scene.background = new THREE.CubeTextureLoader(loadingManager)
             fakeCamera.near = 0.045;
             camera.updateProjectionMatrix();
             fakeCamera.updateProjectionMatrix();
-            fakeCamera.position.z = controls.minDistance;
+            fakeCamera.position.z = controls.minDistance * 2;
         } else {
             camera.near = 0.001;
             fakeCamera.near = 0.001;
@@ -266,7 +285,7 @@ scene.background = new THREE.CubeTextureLoader(loadingManager)
             fakeCamera.updateProjectionMatrix();
             fakeCamera.position.x = controls.minDistance * 3.5;
             fakeCamera.position.y = 0;
-            fakeCamera.position.z = controls.minDistance;
+            fakeCamera.position.z = controls.minDistance * 2;
         }
         
         camera.copy(fakeCamera);
