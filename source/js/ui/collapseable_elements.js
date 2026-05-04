@@ -54,9 +54,7 @@ class UICollapseableElement {
 */
 const AffectedByExpandingElementsConfigurationList = [
     [[0, 1],['objects-list-panel', 0]],
-    [[1, 1], ['side-panel', 0]], 
-    [[0, 1], ['side-panel__object-description', 'folded-chapter'], ['side-panel__object-description-paragraph', 0], ['folded-description-chapter-plus-sign', 0]],
-    [[0, 1], ['side-panel__object-features', 'folded-chapter'], ['side-panel__object-features-groups-list', 0], ['folded-features-chapter-plus-sign', 0]]
+    [[1, 1], ['side-panel', 0]]
 ];
 
 let collapseableStructuresList = [];

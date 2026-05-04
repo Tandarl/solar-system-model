@@ -218,8 +218,8 @@ class Star extends CelestialBody {
     constructor(obj) {
         super(obj);
 
-        this.geometry = new THREE.SphereGeometry(obj.radius / SCALE_DIV, 64, 64);
-        this.atmosphereGeometry = new THREE.IcosahedronGeometry((obj.radius / SCALE_DIV), 10);
+        this.geometry = new THREE.SphereGeometry(obj.radius / SCALE_DIV, 42, 42);
+        this.atmosphereGeometry = new THREE.IcosahedronGeometry((obj.radius / SCALE_DIV), 8);
 
         this.SpeedParams = {
             RotationAroundAxisVelocity: ((obj.body_parameters["скорость вращения вокруг своей оси"].replace(/[^\d.-]/g, ''))) / (obj.radius * SCALE_DIV),
