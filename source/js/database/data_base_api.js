@@ -1,7 +1,6 @@
 // Перевод json файла в формат js объекта
 let DataBase = require('../../assets/celestial_bodies_data.json');
 DataBase = DataBase.solarSystem;
-console.log(DataBase);
 
 // Аппаратный интерфейс для взаимодействия с базой данных
 export const DBAPI = {

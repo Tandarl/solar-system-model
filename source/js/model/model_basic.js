@@ -7,15 +7,10 @@ import { SidePanel } from "../ui/side_panel";
 
 
 // [-------] Глобальные константы конфигурации [-------]
-
-// const SUN_LIGHT_INTENSITY = 2.8e9;
-// BASE SCALE DIVIDER = 10000
 const SCALE_DIVIDER = 10000;
 const CAMERA_MAX_DISTANCE = 900000;
 const ENABLE_DAMPING = true;
 const ENABLE_PAN = false;
-
-// [-------] Глобальные константы конфигурации [-------]
 
 // [-------] Начало базовой организации модели [-------]
 
@@ -25,7 +20,7 @@ const canvas = document.querySelector('canvas.three-js');
 // Инициализация и настройка сцены
 const scene = new THREE.Scene();
 
-// Установка снимка млечного пути задним фоном
+// Установка снимка млечного пути задним фоном сцены
 scene.background = new THREE.CubeTextureLoader(loadingManager)
     .setPath("./assets/textures/milky_way/")
     .load([
@@ -41,7 +36,7 @@ scene.background = new THREE.CubeTextureLoader(loadingManager)
     const renderer = new THREE.WebGLRenderer({
         canvas, // Описано выше
         antialias: true, // Сглаживание для уменьшения эффекта "лесенок" по краям объектов
-        logarithmicDepthBuffer: false, // Оптимизация буфера глубины (см. текст работы для подробностей)
+        logarithmicDepthBuffer: false,
     });
     
     // Инициализация и настройка рендерера для лейблов и маркеров объектов
@@ -49,19 +44,13 @@ scene.background = new THREE.CubeTextureLoader(loadingManager)
     labelRenderer.setSize(window.innerWidth, window.innerHeight);
     labelRenderer.domElement.style.position = 'absolute';
     labelRenderer.domElement.style.top = '0px';
-    // labelRenderer.domElement.style.pointerEvents = 'none';
     document.body.appendChild(labelRenderer.domElement); 
-    // console.log('LABEL RENDERER INFO", labelRenderer);
 
     // Установка размера для потока вывода изображения
     renderer.setSize(window.innerWidth, window.innerHeight);
-    
-    
-    // Заполняющий свет, чтобы неосвещенные участки планет не были просто черными пятнами
 
     // Добавление объектов на сцену
     function init() {
-        // console.log("SUN", celestialBodiesMeshesList[0]);
         scene.add(celestialBodiesMeshesList[0].starGroup);
         for (let i = 1; i < celestialBodiesMeshesList.length; i++) {
             scene.add(celestialBodiesMeshesList[i].groups.subsidiaryGrandGroup);
@@ -79,15 +68,11 @@ scene.background = new THREE.CubeTextureLoader(loadingManager)
     );
 
     camera.layers.set(0);
-    // camera.layers.enable(1);
     
     // Начальная позиция камеры
     camera.position.x = -27000;
     camera.position.y = 29000;
     camera.position.z = 32000;
-    // camera.position.x = 30000;
-    // camera.position.y = 0;
-    // camera.position.z = 0;
     
     // Инициализация и настройка элементов управления камерой
     
@@ -102,7 +87,6 @@ scene.background = new THREE.CubeTextureLoader(loadingManager)
     controls.minDistance = (focusObject.radius / SCALE_DIVIDER) * 5;
 
     fakeCamera.layers.set(0);
-    // fakeCamera.layers.enable(1);
     
     controls.addEventListener('change', InitiateLabelsCheck);
 
@@ -184,7 +168,7 @@ scene.background = new THREE.CubeTextureLoader(loadingManager)
         chooseAction(d) {
             this.distance = d;
             if (this.distance != this.previousDistance) {
-                // console.log("DISTANCE", d);
+
                 // Условия для планет
                 this.choosePlanetsAction();
 
@@ -201,7 +185,6 @@ scene.background = new THREE.CubeTextureLoader(loadingManager)
         checkBoxState: true,
 
         changeOrbitsVisibility() {
-            console.log("OLD and NEW Orbit visibility state", this.checkBoxState, !this.checkBoxState);
             this.checkBoxState = !this.checkBoxState;
             if (this.checkBoxState) {
                 camera.layers.set(0);
@@ -210,27 +193,21 @@ scene.background = new THREE.CubeTextureLoader(loadingManager)
                 camera.layers.set(1);
                 fakeCamera.layers.set(1);
             }
-            console.log(camera.layers.test(focusObject.mesh.layers));
-            console.log(camera.layers, focusObject.mesh.layers);
         },
 
         bindCheckboxOnclickTrigger() {
             this.orbitsCheckBox.onclick = this.changeOrbitsVisibility.bind(this);
-            // this.orbitsIcon.onclick = this.changeOrbitsVisibility;
         },
 
     }
     
-    // Функция обновления минимальной дистанции, в зависимости
-    // от радиуса объекта
+    // Функция обновления минимальной дистанции, в зависимости от радиуса объекта
     function updateControlsParams() {
-        // console.log("NEW FOCUS AND IT'S RADIUS", focusObject, focusObject.radius);
         if(focusObject.id == 0) {
             controls.minDistance = (focusObject.radius / SCALE_DIVIDER) * 5;
         } else {
             controls.minDistance = (focusObject.radius / SCALE_DIVIDER) * 3;
         }
-        // console.log("NEW MIN DIST", controls.minDistance);
     }
 
     
@@ -249,7 +226,6 @@ scene.background = new THREE.CubeTextureLoader(loadingManager)
 
     function unloadPlanetGroup(id) {
         if(id != 0) {
-            console.log("UNLOAD FUNC TRIGGERED");
             scene.remove(celestialBodiesMeshesList[id].groups.meshMoonsGrandGroup);
         }
     };
@@ -294,12 +270,7 @@ scene.background = new THREE.CubeTextureLoader(loadingManager)
         }
         
         camera.copy(fakeCamera);
-
-
-        console.log(renderer.info);
     }
-
-// [-------] Функции обновления состояния камеры и инструментов управления [-------]
 
 
 // [-------] Работа с отображением лейблов у объектов [-------]
@@ -308,9 +279,6 @@ scene.background = new THREE.CubeTextureLoader(loadingManager)
         LabelManager.chooseAction(distance);
     }
 
-// [-------] Работа с отображением лейблов у объектов [-------]
-
-// Сферическая система координат (см. статью Википедии)
 
 // [-------] Инициализация часов (см. renderLoop для деталей) [-------]
 
@@ -320,8 +288,6 @@ let PreviousTime = 0;
 let delta;
 
 uniformData.u_time.value = clock.getElapsed();
-
-// [-------] Инициализация часов [-------]
 
 // [-------] Цикл renderLoop [-------]
 
@@ -353,18 +319,11 @@ uniformData.u_time.value = clock.getElapsed();
         window.requestAnimationFrame(renderLoop);
     }
 
-// [-------] Цикл renderLoop [-------]
-
 // [-------] Вызов функций инициализации и активация цикла отрисовки [-------]
 
     init();
     updateControlsParams();
-    console.log("RENDERER INFO", renderer.info);
     renderLoop();
-
-
-// [-------] Вызов функций инициализации и активация цикла отрисовки [-------]
-
 
 
     export {scene, camera, changeFocusedObject, unloadPlanetGroup, SCALE_DIVIDER}

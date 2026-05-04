@@ -17,9 +17,6 @@ const SCALE_DIV = 10000;
             type: 'f',
             value: 0.0,
         },
-        uvScale: { 
-            value: new THREE.Vector2(3.0, 1.0) 
-        },
     }
 
     // [-------] Uniforms для шейдеров [-------]
@@ -92,8 +89,6 @@ const timeController = {
         this.outputElement = document.querySelector("output");
         
         this.outputElement.value = "стандартный темп";
-        
-        console.log("OUTPUT ELEM", this.outputElement)
 
         this.sliderElement.addEventListener("change", (event) => {
             this.sliderValue = event.target.value;
@@ -121,11 +116,6 @@ const timeController = {
             }
         });
     },
-    
-    reflectValue() {
-        console.log("REFLECT", this.outputElement);
-        console.log(this.sliderElement.value);
-    }
 }
 
 
@@ -135,10 +125,7 @@ class CelestialBody {
         this.radius = obj.radius;
         this.id = obj.id;
 
-        
-        // this.geometry = new THREE.IcosahedronGeometry(obj.radius/SCALE_DIV, 12);
         this.geometry = new THREE.SphereGeometry(obj.radius / SCALE_DIV, 32, 32);
-        // this.geometry = new THREE.SphereGeometry(obj.radius / SCALE_DIV, 42, 42);
         
         this.mesh = new THREE.Mesh(this.geometry, this.material);
 
@@ -195,7 +182,6 @@ class CelestialBody {
     }
 
     ToggleFocusState(command) {
-        console.log("focus state toggle", command);
         if(command) {
             this.textLabelElem.style.visibility = "hidden";
             this.markerLabelELem.style.visibility = "hidden";
@@ -232,12 +218,7 @@ class Star extends CelestialBody {
             vertexShader: generalBodyVertexShader,
             fragmentShader: sunFragmentShader,
             uniforms: this.starUniforms,
-            // transparent: false,
-            // depthWrite: false,
-            // blending: THREE.MultiplyBlending
         })
-
-        console.log(this.geometry);
 
         this.mesh = new THREE.Mesh(this.geometry, this.material);
         this.mesh.rotation.z = MathUtils.degToRad(obj.tilt);
@@ -246,16 +227,6 @@ class Star extends CelestialBody {
 
         this.sunAtmosphereColor = "#f8e8b3";
         this.starUniforms.uSunAtmosphereColor = new THREE.Uniform(new THREE.Color(this.sunAtmosphereColor));
-        // Атмосфера
-        // this.atmosphereMaterial = new THREE.ShaderMaterial({
-        //     vertexShader: generalAtmosphereVertexShader,
-        //     fragmentShader: sunAtmosphereFragmentShader,
-        //     uniforms: this.starUniforms,
-        //     side: THREE.BackSide,
-        //     transparent: true,
-        //     // depthWrite: false,
-        //     // blending: THREE.AdditiveBlending
-        // });
         this.atmosphereMaterial = new THREE.ShaderMaterial({
             side: THREE.BackSide,
             transparent: true,
@@ -267,7 +238,6 @@ class Star extends CelestialBody {
 
 
         this.atmosphere = new THREE.Mesh(this.geometry, this.atmosphereMaterial);
-        // this.atmosphere.scale.set(1.5, 1.5, 1.5);
         this.atmosphere.scale.set(2, 2, 2);
 
 
@@ -276,9 +246,10 @@ class Star extends CelestialBody {
         this.markerLabelELem.style.visibility = "hidden";
 
         // Вспомогательный объект, к которому будет прикреплена камера
-        this.auxiliaryCubeGeometry = new THREE.BoxGeometry(0.001, 0.001, 0.001);
+        this.auxiliaryCubeSize = Math.trunc(this.radius / (SCALE_DIV * 10));
+        this.auxiliaryCubeGeometry = new THREE.BoxGeometry(this.auxiliaryCubeSize, this.auxiliaryCubeSize, this.auxiliaryCubeSize);
         this.auxiliaryCubeMaterial = new THREE.MeshBasicMaterial({ 
-            color: 0xffc108,
+            color: 0xffffff,
             transparent: true,
             opacity: 0.0
         });
@@ -314,7 +285,6 @@ class Star extends CelestialBody {
 
     UnloadCheck() {
         if (this.id.toString()[0] != previousFocus.id.toString()[0]) {
-            // console.log("THIS AND PREV IDS are equal", (this.id.toString()[0] == previousFocus.id.toString()[0]));
             unloadPlanetGroup(Number(previousFocus.id.toString()[0]));
         }
     }
@@ -347,16 +317,13 @@ class Planet extends CelestialBody {
         // Наклонение орбиты планеты относительно плоскости эклиптики
         this.orbitInclination = degToRad(obj.orbitInclination);
 
-        // this.geometry = new THREE.SphereGeometry(obj.radius / SCALE_DIV, 64, 25);
         this.geometry = new THREE.SphereGeometry(obj.radius / SCALE_DIV, 64, 64);
-        // this.geometry = new THREE.IcosahedronGeometry(obj.radius / SCALE_DIV, 18);
         
         this.material = new THREE.ShaderMaterial({});
 
         this.markerColor = modelOrbitsAndIconsColors[this.id % 9];
         
         this.SpeedParams.OrbitalVelocity = (obj.orbit_parameters["орбитальная скорость"].replace(/[^\d.-]/g, '')) / (obj.mediumDistanceFromParentObject); 
-        console.log("orbit vel:", this.SpeedParams.OrbitalVelocity);
 
         // Определение дистанции (в рамках модели) от объекта до того небесного тела, вокруг которого он обращается
         this.distance = obj.mediumDistanceFromParentObject / SCALE_DIV;
@@ -410,8 +377,6 @@ class Planet extends CelestialBody {
                 vertexShader: generalBodyVertexShader,
                 fragmentShader: rockyGasFragmentShader,
                 uniforms: this.planetUniforms,
-                // wireframe: true
-                // map: textureLoader.load(`./assets/textures/${obj.id}/texture.jpg`),
             });
         }
 
@@ -422,7 +387,6 @@ class Planet extends CelestialBody {
                 nightTexture: textureLoader.load(`./assets/textures/${obj.id}/night_texture.jpg`),
                 specularCloudsTexture: textureLoader.load(`./assets/textures/${obj.id}/bump_roughness_clouds.jpg`)
             }
-            // this.textures.dayTexture.colorSpace = THREE.SRGBColorSpace;
             this.textures.nightTexture.colorSpace = THREE.SRGBColorSpace;
             
             this.textures.dayTexture.anisotropy = 8;
@@ -442,8 +406,6 @@ class Planet extends CelestialBody {
                 vertexShader: generalBodyVertexShader,
                 fragmentShader: earthFragmentShader,
                 uniforms: uniformData,
-                // wireframe: true
-                // map: textureLoader.load(`./assets/textures/${obj.id}/texture.jpg`),
             });
 
             this.atmosphereMaterial = new THREE.ShaderMaterial({
@@ -461,9 +423,7 @@ class Planet extends CelestialBody {
 
             this.groups.axisTiltGroup.add(this.atmosphere);
 
-            console.log("EARTH POSITION", this.mesh.position);
 
-            console.log("THIS IN EARTH", this);
             this.moons.push(new Moon(celestialBodiesData[4], this));
             this.groups.meshMoonsGroup.add(this.moons[0].GeneralGroup);
         }
@@ -505,17 +465,6 @@ class Planet extends CelestialBody {
             this.innerRadius = obj.innerRingsDistanceFromTheCenterOfPlanet / SCALE_DIV;
             this.outerRadius = obj.outerRingsDistanceFromTheCenterOfPlanet / SCALE_DIV;
 
-            this.ringsGeometry = new THREE.RingGeometry(this.innerRadius, this.outerRadius, 64);
-
-            this.ringsMaterial = new THREE.MeshStandardMaterial({
-                side: THREE.DoubleSide,
-                transparent: true,
-                map: textureLoader.load(`./assets/textures/${obj.id}/rings_texture.jpg`),
-                emissive: 0x141414,
-                emissiveIntensity: 1,
-            });
-
-
             if (obj.id == 6) {
                 this.ringsUniforms = {
                     uRingsTexture: 0,
@@ -525,7 +474,6 @@ class Planet extends CelestialBody {
                 this.ringsUniforms.uRingsAlpha = new THREE.Uniform(textureLoader.load(`./assets/textures/${obj.id}/rings_alpha.gif`) )
                 this.ringsUniforms.uRingsTexture.anisotropy = 8;
 
-                // this.ringsGeometry = new THREE.RingGeometry(this.innerRadius, this.outerRadius, 128);
                 this.ringsGeometry = new THREE.RingGeometry(this.innerRadius, this.outerRadius, 128).rotateX(-Math.PI / 2);
 
                 this.uvAttr = this.ringsGeometry.attributes.uv;
@@ -566,6 +514,16 @@ class Planet extends CelestialBody {
             }
 
             if(this.id != 6) {
+                this.ringsGeometry = new THREE.RingGeometry(this.innerRadius, this.outerRadius, 64);
+
+                this.ringsMaterial = new THREE.MeshStandardMaterial({
+                    side: THREE.DoubleSide,
+                    transparent: true,
+                    map: textureLoader.load(`./assets/textures/${obj.id}/rings_texture.jpg`),
+                    emissive: 0x141414,
+                    emissiveIntensity: 1,
+                });
+
                 this.ringsMaterial.map.anisotropy = 8;
     
                 this.ringsMesh = new THREE.Mesh(this.ringsGeometry, this.ringsMaterial);
@@ -623,7 +581,7 @@ class Planet extends CelestialBody {
 
         
         // Вспомогательный объект, к которому будет прикреплена камера
-        this.auxiliaryCubeSize = (this.radius / SCALE_DIV) / 100;
+        this.auxiliaryCubeSize = (this.radius / (SCALE_DIV * 10));
         this.auxiliaryCubeGeometry = new THREE.BoxGeometry(this.auxiliaryCubeSize, this.auxiliaryCubeSize, this.auxiliaryCubeSize);
         this.auxiliaryCubeMaterial = new THREE.MeshBasicMaterial({
             color: 0xffc108,
@@ -712,12 +670,9 @@ class Planet extends CelestialBody {
             // Переход объекта от которого был совершен переход в состояние "расфокуса", затем передача текущего объекта в переменную focusObject
             // и смена цели слежения для камеры на новосфокусированный объект
             focusObject.ToggleFocusState(0);
-            console.log("THIS IS NEW FOCUS", this);
             focusObject = this;
             if (focusObject.id >= 3 && focusObject.moons?.length) {
                 for(let i =0; i < focusObject.moons.length; i++) {
-                    // this.textLabelElem.style.visibility = "hidden";
-                    // this.markerLabelELem.style.visibility = "hidden";
                     focusObject.moons[i].textLabelElem.style.visibility = "visible";
                     focusObject.moons[i].markerLabelELem.style.visibility = "visible";
                 }
@@ -740,11 +695,6 @@ class Moon extends CelestialBody {
 
         this.textures.surfaceTexture.anisotropy = 8;
 
-       
-        // if (obj.id in [31, 41, 42]) {
-        //     this.AtmosphereDayColor = '#8d8d8d';
-        //     this.AtmosphereTwilightColor = '#636363';
-        // }
         this.AtmosphereDayColor = '#8d8d8d';
         this.AtmosphereTwilightColor = '#636363';
 
@@ -761,12 +711,8 @@ class Moon extends CelestialBody {
             vertexShader: generalBodyVertexShader,
             fragmentShader: MoonFragmentShader,
             uniforms: this.planetUniforms,
-            // wireframe: true
-            // map: textureLoader.load(`./assets/textures/${obj.id}/texture.jpg`),
         });
         this.mesh.material = this.material;
-
-        // this.parentObject = parent;
 
         this.SpeedParams = {
             RotationAroundAxisVelocity: ((obj.orbit_parameters["скорость вращения вокруг своей оси"].replace(/[^\d.-]/g, '')) * SCALE_DIV) / (obj.radius * 1000 * SCALE_DIV),
@@ -824,7 +770,7 @@ class Moon extends CelestialBody {
         this.auxiliaryCubeGeometry = new THREE.BoxGeometry(this.auxiliaryCubeSize, this.auxiliaryCubeSize, this.auxiliaryCubeSize);
 
         this.auxiliaryCubeMaterial = new THREE.MeshBasicMaterial({
-            color: 0xffc108,
+            color: 0xffffff,
             transparent: true,
             opacity: 0.0
         });
@@ -864,7 +810,6 @@ class Moon extends CelestialBody {
 
         this.RandomizePosition();
 
-        // this.planetUniforms.uPlanetPosition = new THREE.Uniform(new THREE.Vector3(this.moonGroup.position.x, this.moonGroup.position.y, this.moonGroup.position.z));
         this.planetPos = new THREE.Vector3(0, 0, 0);
         this.moonGroup.getWorldPosition(this.planetPos);
         this.planetUniforms.uPlanetPosition = new THREE.Uniform(this.planetPos);
@@ -872,7 +817,6 @@ class Moon extends CelestialBody {
         this.meshWorldPos = new THREE.Vector3(0, 0, 0);
         this.mesh.getWorldPosition(this.meshWorldPos);
         this.planetUniforms.uMeshWorldPos = new THREE.Uniform(this.meshWorldPos);
-        // console.log("MOON GROUP POS", this.planetUniforms.uPlanetPosition, this.meshWorldPos);
     }
 
     UpdateRotation(delta) {
@@ -887,7 +831,6 @@ class Moon extends CelestialBody {
         this.UpdateRotation(delta);
         this.UpdatePosition(delta);
 
-        // console.log(this.moonGroup.position.x);
         this.moonGroup.getWorldPosition(this.planetPos);
         this.planetUniforms.uPlanetPosition.value.copy(this.planetPos);
 
@@ -896,7 +839,6 @@ class Moon extends CelestialBody {
     }
 
     UnloadCheck() {
-        console.log("MOON UNLOAD CHECK TRIGGERED");
         if (this.id.toString()[0] != previousFocus.id.toString()[0]) {
             unloadPlanetGroup(Number(previousFocus.id.toString()[0]));
         }
@@ -914,7 +856,6 @@ class Moon extends CelestialBody {
             // Переход объекта от которого был совершен переход в состояние "расфокуса", затем передача текущего объекта в переменную focusObject
             // и смена цели слежения для камеры на новосфокусированный объект
             focusObject.ToggleFocusState(0);
-            console.log("FOCUS TOGGLE", this);
             focusObject = this;
             for(let i = 0; i < focusObject.parent.moons.length; i++) {
                 if(focusObject.parent.moons[i].id != focusObject.id) {
@@ -941,27 +882,11 @@ for(let obj of celestialBodiesData) {
     if(obj.id == 0) celestialBodiesMeshesList.push(new Star(obj));
     else if(obj.id < 9) celestialBodiesMeshesList.push(new Planet(obj)); // < 9
 }
-console.log("MAIN MESHES LIST",celestialBodiesMeshesList);
-console.log("IT'S LENGTH", celestialBodiesMeshesList.length);
-
-console.log("DATA", celestialBodiesData);
 
 
 let focusObject = celestialBodiesMeshesList[0];
-// console.log(`focusObject:`, focusObject);
 
 timeController.init();
 
 
 export {celestialBodiesMeshesList, focusObject, uniformData, loadingManager};
-
-
-/* 
-    const curve = new THREE.EllipseCurve(
-	0,  0,            // ax, aY
-	10, 10,           // xRadius, yRadius
-	0,  2 * Math.PI,  // aStartAngle, aEndAngle
-	false,            // aClockwise
-	0                 // aRotation
-);
-*/ 
