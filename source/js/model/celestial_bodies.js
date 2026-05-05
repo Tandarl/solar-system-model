@@ -695,9 +695,13 @@ class Moon extends CelestialBody {
 
         this.textures.surfaceTexture.anisotropy = 8;
 
-        this.AtmosphereDayColor = '#8d8d8d';
-        this.AtmosphereTwilightColor = '#636363';
-
+        if (obj.id != 64) {
+            this.AtmosphereDayColor = '#8d8d8d';
+            this.AtmosphereTwilightColor = '#636363';
+        } else {
+            this.AtmosphereDayColor = '#c2956a';
+            this.AtmosphereTwilightColor = '#C88A4A';
+        }
         this.planetUniforms = THREE.UniformsUtils.clone(uniformData);
         this.planetUniforms.uSurfaceTexture = new THREE.Uniform(this.textures.surfaceTexture);
         this.planetUniforms.id = obj.id;
@@ -739,8 +743,23 @@ class Moon extends CelestialBody {
         this.moonGroup = new THREE.Group();
         this.axisTiltGroup = new THREE.Group();
         this.GeneralGroup = new THREE.Group();
-        
-        
+
+
+        if(this.id == 64) {
+            this.atmosphereMaterial = new THREE.ShaderMaterial({
+                vertexShader: generalAtmosphereVertexShader,
+                fragmentShader: rockyAtmosphereFragmentShader,
+                uniforms: this.planetUniforms,
+                side: THREE.BackSide,
+                transparent: true,
+            });
+            this.atmosphere = new THREE.Mesh(this.geometry, this.atmosphereMaterial);
+            this.atmosphere.scale.set(1.06, 1.06, 1.06);
+            this.atmosphere.layers.enable(0);
+            this.atmosphere.layers.enable(1);
+
+            this.axisTiltGroup.add(this.atmosphere);
+        }
         
         this.distance = (obj.mediumDistanceFromParentObject / SCALE_DIV) + parent.distance;
         this.distToParent = (obj.mediumDistanceFromParentObject / SCALE_DIV);
