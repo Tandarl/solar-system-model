@@ -54,9 +54,7 @@ const userDevice = {
     isMobile: false,
 
     getDeviceType() {
-        console.log("DEVICE CHECK");
         if (window.matchMedia('(pointer: coarse)').matches && window.matchMedia('(max-width: 1024px)').matches) {
-            console.log("THIS IS MOBILE");
             this.isMobile = true;
         }
     }
@@ -99,6 +97,7 @@ const userDevice = {
     controls.enableDamping = ENABLE_DAMPING; // Эффект "инерции" при вращении камеры. Дает большую иммерсивность
     if(userDevice.isMobile) {
         controls.zoomSpeed = 4;
+        controls.rotateSpeed = 0.4;
     } else {
         controls.zoomSpeed = 8;
     }
